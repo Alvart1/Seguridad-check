@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../css/estilo-formulario.css">
+</head>
+<body>
+    <div class="encabezado"><h1>Formulario entrada de viajeros</h1></div>
+<form>
+    <div class="campo">
+    <label for="nombre">nombre:</label>
+    <input type="text" id="nombre" required></div>
+     <div class="campo">
+    <label for="apellidos">apellidos:</label>
+    <input type="text" id="apellidos" required></div>
+     <div class="campo">
+   <label for="genero">Género:</label>
+    <select id="genero" name="genero" required>
+  <option value="masculino">Másculino</option>
+  <option value="femenino">Femenino</option>
+  <option value="otro">Otro</option>
+  <option value="no-responder">Prefiero no responder</option>
+</select></div>
+<div class="campo">
+  <label for="dni">Documento:</label> 
+    <select id="dni" name="dni" required>
+  <option value="dni">dni</option>
+  <option value="nie">nie</option>
+  <option value="pasaporte">pasaporte</option>
+  <option value="otro">Otro</option>
+</select></div>
+ <div class="campo">
+    <label for="documento">Código de documento:</label>
+    <input type="text" id="documento" required></div>
+     <div class="campo">
+    <label for="tlf">teléfono:</label>
+    <input type="tel" id="tlf" maxlength="12"></div>
+     <div class="campo">
+    <label for="direccion">dirección:</label>
+    <input type="text" id="direccion" required></div>
+     <div class="campo">
+    <label for="fecha">fecha de nacimiento:</label>
+    <input type="date" id="fecha" required></div>
+     <div class="campo">
+    <label for="soporte">número soporte del dni:</label>
+    <input type="text" id="soporte" maxlength="6" required></div>
+     <div class="campo">
+    <label for="correo">correo electrónico:</label>
+    <input type="email" id="correo" required></div>
+     <div class="campo">
+    <label for="nacionalidad">nacionalidad:</label>
+    <input type="text" id="nacionalidad" required></div>
+    <div class="campo">
+    <button>enviar</button>
+    </div>
+</form>
+</body>
+</html>

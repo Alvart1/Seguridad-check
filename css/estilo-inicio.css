@@ -1,0 +1,42 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    background-color: rgb(199, 199, 199);
+display: flex;
+flex-direction: column;
+width: 100%;
+justify-content: center;
+align-items: center;
+}
+.titulo{
+    width: 100%;
+    background-color: black;
+text-align: center;
+
+padding: 5%;
+}
+.titulo h1{
+    text-transform: uppercase;
+    color: white;
+    font-size: 53px;
+
+}
+p{
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    font-size: 40px;
+    padding: 2em 15px 15px 15px;
+    text-transform: uppercase;
+    border-bottom: 4px solid black;
+}
+img  {
+margin: 7rem;
+    width: 100%;
+display: flex;
+justify-content: center;
+align-items: center;
+max-width: 40%;
+}

@@ -1,0 +1,70 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+body {
+    background-color: rgb(0, 35, 80);
+    align-items: center;
+    justify-content: center;
+    
+}   
+.encabezado {
+ font-size: 32px;
+ display: block;
+    width: 80%;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bolder;
+    padding: 2.5em;
+    margin:0 auto;
+    margin-top: 20px;
+    align-items: center;
+background-color: rgba(137, 164, 214, 0.3);
+border: 2px solid  rgba(102, 141, 214, 0.3);
+box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+border-radius: 20px;
+}
+form {
+    max-width: 100%;
+    height: 0 auto;
+    justify-items: center;
+    margin-bottom: 20px;
+}
+.campo {
+    text-transform: uppercase;
+    text-align: center;
+    width: 80%;
+    padding: 2.5em;
+background-color: rgba(137, 164, 214, 0.3);
+font-size: 32px;
+font-weight: bolder;
+border: 2px solid  rgba(102, 141, 214, 0.3);
+box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+border-radius: 20px;
+}
+
+.campo label{
+    float: left;
+
+}
+.campo input , .campo select {
+    float: right;
+    
+    width: 55%;
+    height: 3rem;
+    font-size: larger;
+}
+body button{
+    display: block;
+    width: 80%;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bolder;
+    padding: 1.5rem;
+    margin:1% auto;
+    align-items: center;
+    cursor: pointer;
+    background-color: rgb(223, 195, 159);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+border-radius: 20px;
+}
