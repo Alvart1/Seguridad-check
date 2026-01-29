@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/estilo-inicio.css">
+    <title>Web de Check-in</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="titulo">
+        <h1>Bienvenido querido cliente!!!</h1>
+    </div>
+    
+    <p>Introduzca su PIN para generar el código QR de acceso:</p>
+    
+    <input type="password" id="pinInput" placeholder="PIN de 4 dígitos" maxlength="4">
+    <button onclick="verificarYGenerar()">Generar QR</button>
+
+    <div id="qrcode"></div>
+
+    <script src="js/index-js.js"></script>
+</body>
+</html>

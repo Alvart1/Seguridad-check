@@ -37,19 +37,17 @@ function checkPin() {
 
 // 3. Función para generar el código QR dinámicamente
 function generarQR(pin) {
-    // Limpiamos el contenedor por si había un QR viejo
     const contenedorQR = document.getElementById("qrcode");
     contenedorQR.innerHTML = "";
 
-    // IMPORTANTE: Sustituye 'Alvart1' por tu nombre de usuario real de GitHub
-    const urlDestino = `https://Alvart1.github.io/Seguridad-check/formulario.html?reserva=${pin}`;
+    // Esta es la URL que sale en tu captura de pantalla de GitHub
+    const urlDestino = `https://alvart1.github.io/Seguridad-check/formulario.html?reserva=${pin}`;
 
-    // Creamos el QR (Asegúrate de tener la librería en el <head>)
     new QRCode(contenedorQR, {
         text: urlDestino,
         width: 200,
         height: 200,
-        colorDark : "#003580", // Azul Booking
+        colorDark : "#003580",
         colorLight : "#ffffff"
     });
 }
