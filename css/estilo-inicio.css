@@ -1,7 +1,8 @@
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* Para que el padding no rompa el ancho */
+    box-sizing: border-box;
+    
 }
 
 body {
@@ -9,9 +10,11 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-height: 100vh; /* Asegura que el fondo cubra toda la pantalla */
-    justify-content: flex-start; /* Empieza desde arriba */
+    min-height: 100vh;
+    justify-content: flex-start;
     align-items: center;
+    font-family: sans-serif;
+    
 }
 
 .titulo {
@@ -31,39 +34,61 @@ p {
     color: black;
     text-align: center;
     text-decoration: none;
-    font-size: 30px; /* Un pelín más pequeño para que no ocupe tanto */
+    font-size: 30px;
     padding: 2em 15px 15px 15px;
     text-transform: uppercase;
     border-bottom: 4px solid black;
     margin-bottom: 20px;
+    width: 90%; /* Ajuste para que la línea no sea infinita */
 }
 
-/* --- ESTILOS NUEVOS PARA EL PIN --- */
-input#pinInput {
+input, #pinInput {
     font-size: 30px;
     padding: 15px;
-    width: 250px;
+    width: 40%;
     text-align: center;
     border: 3px solid black;
     border-radius: 10px;
     margin-bottom: 15px;
 }
+#pantalla-resultado  {
+    display: none; 
+    width: 100%; 
+    flex-direction: column; 
+    align-items: center;
+}
+#pantalla-resultado > button{
+    width: 40%;
+    font-size: 25px;
+    padding: 45px 50px;
+    background-color:black;
+    color: rgb(255, 255, 255);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+#pantalla-inicio {
+    width: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+}
 
-button {
+#pantalla-inicio > button {
+    width: 40%;
     font-size: 25px;
     padding: 15px 30px;
-    background-color: black;
+    background-color:black;
     color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     text-transform: uppercase;
-    
 }
 
-button:active {
-    background-color: #666565; /* Efecto al pulsar */
-    
+#pantalla-inicio > button:active {
+    background-color: #666565;
 }
 
 #qrcode {
@@ -71,6 +96,17 @@ button:active {
     display: flex; 
     justify-content: center;
     padding: 20px;
-    background-color: white; /* Fondo blanco para que el QR se lea mejor */
+    background-color: white;
+    border: 4px solid black; /* Para mantener la estética fuerte */
     border-radius: 10px;
 }
+
+.enlace-secreto {
+    margin-top: 30px;
+    font-size: 24px;
+    color: black;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: underline;
+}
+

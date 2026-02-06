@@ -1,58 +1,90 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<link rel="stylesheet" href="css/estilo-formulario.css">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/estilo-formulario.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="encabezado"><h1>Formulario entrada de viajeros</h1></div>
-<form>
-    <div class="campo">
-    <label for="nombre">nombre:</label>
-    <input type="text" id="nombre" required></div>
-     <div class="campo">
-    <label for="apellidos">apellidos:</label>
-    <input type="text" id="apellidos" required></div>
-     <div class="campo">
-   <label for="genero">Género:</label>
-    <select id="genero" name="genero" required>
-  <option value="masculino">Másculino</option>
-  <option value="femenino">Femenino</option>
-  <option value="otro">Otro</option>
-  <option value="no-responder">Prefiero no responder</option>
-</select></div>
-<div class="campo">
-  <label for="dni">Documento:</label> 
-    <select id="dni" name="dni" required>
-  <option value="dni">dni</option>
-  <option value="nie">nie</option>
-  <option value="pasaporte">pasaporte</option>
-  <option value="otro">Otro</option>
-</select></div>
- <div class="campo">
-    <label for="documento">Código de documento:</label>
-    <input type="text" id="documento" required></div>
-     <div class="campo">
-    <label for="tlf">teléfono:</label>
-    <input type="tel" id="tlf" maxlength="12"></div>
-     <div class="campo">
-    <label for="direccion">dirección:</label>
-    <input type="text" id="direccion" required></div>
-     <div class="campo">
-    <label for="fecha">fecha de nacimiento:</label>
-    <input type="date" id="fecha" required></div>
-     <div class="campo">
-    <label for="soporte">número soporte del dni:</label>
-    <input type="text" id="soporte" maxlength="6" required></div>
-     <div class="campo">
-    <label for="correo">correo electrónico:</label>
-    <input type="email" id="correo" required></div>
-     <div class="campo">
-    <label for="nacionalidad">nacionalidad:</label>
-    <input type="text" id="nacionalidad" required></div>
-    <div class="campo">
-    <button>enviar registro</button>
+
+    <div id="paso-inicio" class="encabezado">
+        <h1>¿Cuántos huéspedes son?</h1>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+            <button onclick="comezarRexistro(1)">1</button>
+            <button onclick="comezarRexistro(2)">2</button>
+            <button onclick="comezarRexistro(3)">3</button>
+            <button onclick="comezarRexistro(4)">4</button>
+        </div>
     </div>
-</form>
+
+    <div id="seccion-formulario" class="viajero-bloque" style="display: none; width: 100%;">
+        <h2 id="titulo-formulario" style="text-align: center; margin-top: 20px;">Datos del Viajero 1</h2>
+        
+        <form id="formulario">
+            <div class="campo"><label>Nombre:</label><input type="text" id="nombre" required></div>
+            <div class="campo"><label>Apellidos:</label><input type="text" id="apellidos" required></div>
+
+            <div class="campo">
+                <label>Género:</label>
+                <select id="genero" required>
+                    <option value="masculino">Masculino</option>
+                    <option value="femenino">Femenino</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Tipo Documento:</label>
+                <select id="tipo_documento" required>
+                    <option value="dni">DNI</option>
+                    <option value="nie">NIE</option>
+                    <option value="pasaporte">Pasaporte</option>
+                </select>
+            </div>
+
+            <div class="campo"><label>Código documento:</label><input type="text" id="documento" required></div>
+            <div class="campo"><label>Teléfono:</label><input type="tel" id="tlf"></div>
+            <div class="campo"><label>Dirección:</label><input type="text" id="direccion" required></div>
+            <div class="campo"><label>Fecha nacimiento:</label><input type="date" id="fecha_nac" required></div>
+            <div class="campo"><label>Soporte DNI:</label><input type="text" id="soporte" maxlength="6" required></div>
+            <div class="campo"><label>Email:</label><input type="email" id="correo" required></div>
+            <div class="campo"><label>Nacionalidad:</label><input type="text" id="nacionalidad" required></div>
+
+            <div class="campo" style="align-items: center;">
+                <label>Firma:</label>
+                <canvas id="canvas-firma" width="350" height="200" style="border: 2px solid #000; cursor: crosshair; background-color: aliceblue; border-radius: 10px;"></canvas>
+                <button type="button" onclick="limpar()" style="padding: 1rem; width: 50%; font-size: 14px; margin-top: 10px;">Limpar Firma</button>
+            </div>
+
+            <button type="submit">Enviar Registro</button>
+        </form>
+    </div>
+
+   <div id="seccion-final" style="display: none;" class="encabezado">
+    <h1>Acceso a Llaves</h1>
+    
+    <div id="seleccion-metodo">
+        <p>¿Cómo quieres identificarte?</p>
+        <button onclick="mostrarMetodo('pin')">Usar PIN</button>
+        <button onclick="mostrarMetodo('foto')">Usar Foto</button>
+    </div>
+
+    <div id="metodo-pin" style="display: none; margin-top: 20px;">
+        <input type="text" id="nombre-pin" placeholder="Tu nombre">
+        <input type="password" id="pin-input" placeholder="PIN (1234)" maxlength="4">
+        <button onclick="accederConPin()">Validar Acceso</button>
+    </div>
+
+    <div id="metodo-foto" style="display: none; margin-top: 20px;">
+        <input type="text" id="nombre-foto" placeholder="Tu nombre">
+        <video id="video" width="320" height="240" autoplay style="border-radius: 10px;"></video>
+        <button onclick="accederConFoto()">📸 Capturar y Abrir</button>
+        <canvas id="canvas-foto" style="display:none;" width="320" height="240"></canvas>
+    </div>
+
+    <p id="mensaje-acceso" style="color: yellow;"></p>
+</div>
+
+    <script src="js/formulario.js"></script>
 </body>
 </html>

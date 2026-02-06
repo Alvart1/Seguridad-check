@@ -1,21 +1,21 @@
 * {
     padding: 0;
     margin: 0;
-    box-sizing: border-box; /* Fundamental para que el padding no rompa el ancho */
+    box-sizing: border-box;
 }
 
 body {
     background-color: rgb(0, 35, 80);
-    color: white; /* Para que los textos se lean bien sobre el azul */
+    color: white;
     font-family: sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-bottom: 50px; /* Espacio al final para que el botón no quede pegado */
+    padding-bottom: 50px;
 }   
 
 .encabezado {
-    width: 90%; /* Un poco más ancho para aprovechar el móvil */
+    width: 90%;
     text-align: center;
     text-transform: uppercase;
     padding: 2em 1em;
@@ -27,7 +27,7 @@ body {
 }
 
 .encabezado h1 {
-    font-size: 24px; /* Bajamos un poco el tamaño para que quepa en una línea de móvil */
+    font-size: 24px;
 }
 
 form {
@@ -37,17 +37,32 @@ form {
     align-items: center;
 }
 
+/* Contedor para cada grupo de campos de cada viaxeiro */
+.viajero-bloque {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.viajero-bloque h2 {
+    margin: 20px 0;
+    text-transform: uppercase;
+    font-size: 20px;
+    color: rgb(223, 195, 159); /* Usamos a cor do botón para resaltar o título */
+}
+
 .campo {
     text-transform: uppercase;
     width: 90%;
-    padding: 1.5em; /* Reducimos padding para que el formulario no sea infinito */
+    padding: 1.5em;
     margin-bottom: 15px;
     background-color: rgba(137, 164, 214, 0.3);
     border: 2px solid rgba(102, 141, 214, 0.3);
     box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     display: flex;
-    flex-direction: column; /* Etiqueta arriba, input abajo: ideal para móvil */
+    flex-direction: column;
     gap: 10px;
 }
 
@@ -58,12 +73,23 @@ form {
 }
 
 .campo input, .campo select {
-    width: 100%; /* Ocupa todo el ancho disponible */
-    height: 3.5rem; /* Un poco más alto para facilitar el toque táctil */
+    width: 100%;
+    height: 3.5rem;
     font-size: 18px;
     border-radius: 10px;
     border: 1px solid white;
     padding: 0 10px;
+    background-color: white; /* Aseguramos que o fondo sexa branco para ler ben */
+    color: #333;
+}
+
+/* Estilo para o canvas da firma */
+canvas {
+    max-width: 100%;
+    height: auto;
+    border: 2px solid white;
+    background-color: aliceblue;
+    border-radius: 10px;
 }
 
 button {
@@ -71,16 +97,27 @@ button {
     width: 90%;
     text-transform: uppercase;
     font-weight: bolder;
-    padding: 1.5rem;
-    margin: 20px auto;
+    padding: 2.5rem;
+    margin: 25px auto;
     cursor: pointer;
     background-color: rgb(223, 195, 159);
     border: none;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     border-radius: 20px;
     font-size: 20px;
+    transition: transform 0.1s;
 }
+
 button:active {
-    background-color: #94acc2; /* Efecto al pulsar */
-    
+    background-color: #94acc2;
+    transform: scale(0.98); /* Pequeno efecto de pulsación */
+}
+
+/* Botón de limpar máis pequeno */
+button[onclick="limpar()"] {
+    padding: 1rem;
+    font-size: 14px;
+    width: 50%;
+    background-color: #f44336;
+    color: white;
 }
