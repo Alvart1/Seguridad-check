@@ -12,6 +12,23 @@ const seccionFinal = document.getElementById('seccion-final');
 const tituloForm = document.getElementById('titulo-formulario');
 const formulario = document.getElementById('formulario');
 
+// --- NOVO: COMPROBAR SE XA ESTÁ REXISTRADO AO CARGAR ---
+window.onload = function() {
+    const usuarioRexistrado = localStorage.getItem('hospede_rexistrado');
+    const nomeGardado = localStorage.getItem('nome_hospede');
+
+    if (usuarioRexistrado === 'true') {
+        // Saltamos directo ás chaves
+        seccionInicio.style.display = 'none';
+        seccionForm.style.display = 'none';
+        seccionFinal.style.display = 'block';
+        
+        // Mensaxe personalizada
+        const msgAcceso = document.getElementById('mensaje-acceso');
+        msgAcceso.innerHTML = `<h2 style="color: white;">Bienvenido de nuevo, ${nomeGardado}</h2>`;
+    }
+};
+
 // --- PASO 1: COMEZAR ---
 async function comezarRexistro(numero) {
     totalHospedes = numero;
@@ -62,6 +79,10 @@ formulario.addEventListener('submit', async (e) => {
             actualizarTitulo();
             window.scrollTo(0, 0);
         } else {
+            // GARDAR NA MEMORIA PARA A PRÓXIMA VEZ
+            localStorage.setItem('hospede_rexistrado', 'true');
+            localStorage.setItem('nome_hospede', datos.nombre);
+
             seccionForm.style.display = 'none';
             seccionFinal.style.display = 'block';
         }
@@ -103,11 +124,14 @@ function mostrarMetodo(tipo) {
 let streamCamara = null;
 async function iniciarCamara() {
     const video = document.getElementById('video');
-    streamCamara = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = streamCamara;
+    try {
+        streamCamara = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = streamCamara;
+    } catch (err) {
+        alert("No se pudo acceder a la cámara");
+    }
 }
 
-// LÓXICA DE APERTURA (FETCH)
 async function accionarMotorFisico() {
     const ipRaspberry = "10.158.13.63"; 
     try {
@@ -117,34 +141,31 @@ async function accionarMotorFisico() {
         });
         return respuesta.ok;
     } catch (error) {
-        alert("Erro de conexión coa Raspberry.");
+        console.error("Error conexión:", error);
+        alert("Error de conexión con el cajón físico.");
         return false;
     }
 }
 
-// ACCESO CON PIN (CORRIXIDO)
 async function accederConPin() {
-    const nome = document.getElementById('nombre-pin').value;
+    const nome = document.getElementById('nombre-pin').value || localStorage.getItem('nome_hospede');
     const pin = document.getElementById('pin-input').value;
 
-    if (pin === "1234" && nome !== "") {
+    if (pin === "1234" && nome) {
         const abierto = await accionarMotorFisico();
         if (abierto) {
             await _supabase.from('accesos_llaves').insert([{ nombre_usuario: nome, metodo_acceso: 'PIN' }]);
-            
-            // Limpeza interface
             document.getElementById('metodo-pin').style.display = 'none';
             mostrarContador30s(nome);
         }
     } else {
-        alert("PIN ou nome incorrectos");
+        alert("PIN o nombre incorrectos");
     }
 }
 
-// ACCESO CON FOTO (CORRIXIDO)
 async function accederConFoto() {
-    const nome = document.getElementById('nombre-foto').value;
-    if (nome === "") return alert("Pon o teu nome");
+    const nome = document.getElementById('nombre-foto').value || localStorage.getItem('nome_hospede');
+    if (!nome) return alert("Por favor, introduce tu nombre");
 
     const video = document.getElementById('video');
     const canvasFoto = document.getElementById('canvas-foto');
@@ -155,8 +176,6 @@ async function accederConFoto() {
     const abierto = await accionarMotorFisico();
     if (abierto) {
         await _supabase.from('accesos_llaves').insert([{ nombre_usuario: nome, metodo_acceso: 'FOTO', foto_base64: fotoData }]);
-        
-        // Apagar cámara e limpar interface
         if (streamCamara) streamCamara.getTracks().forEach(track => track.stop());
         document.getElementById('metodo-foto').style.display = 'none';
         mostrarContador30s(nome);
@@ -168,10 +187,17 @@ function mostrarContador30s(nome) {
     const msg = document.getElementById('mensaje-acceso');
     const intervalo = setInterval(() => {
         tiempo--;
-        msg.innerHTML = `<h3>✅ Acceso concedido, ${nome}</h3><b style="color: orange;">⏳ Caixón aberto. Pecharase en ${tiempo}s</b>`;
+        msg.innerHTML = `<h3>✅ Acceso concedido, ${nome}</h3><b style="color: orange;">⏳ Cajón abierto. Se cerrará en ${tiempo}s</b>`;
         if (tiempo <= 0) {
             clearInterval(intervalo);
-            msg.innerHTML = `<b style="color: red;">🔒 Caixón pechado.</b><br><button onclick="location.reload()">Finalizar</button>`;
+            msg.innerHTML = `<b style="color: red;">🔒 Cajón cerrado.</b><br><br>
+                             <button onclick="pecharSesion()">Salir / Nuevo Registro</button>`;
         }
     }, 1000);
+}
+
+// FUNCIÓN PARA PODER VOLVER A EMPEZAR DE CERO
+function pecharSesion() {
+    localStorage.clear();
+    location.reload();
 }
