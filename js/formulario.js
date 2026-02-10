@@ -168,7 +168,7 @@ async function accederConFoto() {
 
 // --- FUNCIÓN PARA ACCIONAR O MOTOR (CONEXIÓN FÍSICA) ---
 async function accionarMotorFisico() {
-    const ipRaspberry = "10.100.89.63"; // CAMBIA ISTO pola IP da túa Raspberry
+    const ipRaspberry = "10.158.13.63"; // CAMBIA ISTO pola IP da túa Raspberry
     console.log("Enviando orde de apertura á Raspberry...");
 
     try {
