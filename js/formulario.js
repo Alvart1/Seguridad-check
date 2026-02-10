@@ -195,12 +195,25 @@ async function accederConPin() {
     const pin = document.getElementById('pin-input').value;
 
     if (pin === "1234" && nome !== "") {
+        
+        // Enviamos a Raspberry
+        const abierto = await accionarMotorFisico();
+        if (abierto) {
         // 1. Gardamos en Supabase
         await _supabase.from('accesos_llaves').insert([{ nombre_usuario: nome, metodo_acceso: 'PIN' }]);
         
-        // 2. Abrimos o caixón físico
-        const abierto = await accionarMotorFisico();
-        if(abierto) mostrarContador30s();
+// 3. LIMPEZA DA INTERFACE
+            document.getElementById('metodo-pin').style.display = 'none'; // Oculta o formulario
+            const msg = document.getElementById('mensaje-acceso');
+            msg.innerHTML = `<h3 style="color: green;">✅ Acceso concedido, ${nome}.</h3>`;
+            
+            // 4. LANZAMOS O CONTADOR
+            mostrarContador30s();
+
+            // 5. Limpar inputs por seguridade
+            document.getElementById('nombre-pin').value = "";
+            document.getElementById('pin-input').value = "";
+        }
     } else {
         alert("PIN ou nome incorrectos");
     }
