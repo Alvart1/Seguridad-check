@@ -49,5 +49,11 @@ button {
     cursor: pointer;
     text-transform: uppercase;
 }
-button:active { transform: scale(0.98); background-color: #ccc; }
-canvas { border: 1px solid white; margin-top: 10px; width: 100%; }
+button:active { 
+    transform: scale(0.98); 
+    background-color: #ccc; 
+}
+canvas { 
+    border: 1px solid white; 
+    margin-top: 10px; 
+    width: 100%; }
