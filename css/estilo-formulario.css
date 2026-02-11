@@ -1,9 +1,4 @@
-* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-}
-
+* { padding: 0; margin: 0; box-sizing: border-box; }
 body {
     background-color: rgb(0, 35, 80);
     color: white;
@@ -11,160 +6,48 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
     padding-bottom: 50px;
-    min-height: 100vh; /* Asegura que se vexa ben en calquera tamaño */
-}   
-
-.encabezado {
-    width: 95%;
+}
+.encabezado, .viajero-bloque {
+    width: 90%;
     max-width: 600px;
     text-align: center;
-    text-transform: uppercase;
     padding: 2em 1em;
     margin: 20px auto;
     background-color: rgba(137, 164, 214, 0.3);
     border: 2px solid rgba(102, 141, 214, 0.3);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     border-radius: 20px;
 }
-
-.encabezado h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-form {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.viajero-bloque {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.viajero-bloque h2 {
-    margin: 20px 0;
-    text-transform: uppercase;
-    font-size: 20px;
-    color: rgb(223, 195, 159);
-}
-
 .campo {
-    text-transform: uppercase;
-    width: 95%;
-    max-width: 550px;
+    width: 90%;
     padding: 1.5em;
-    margin-bottom: 15px;
-    background-color: rgba(137, 164, 214, 0.3);
-    border: 2px solid rgba(102, 141, 214, 0.3);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    border-radius: 20px;
+    margin: 10px auto;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-}
-
-.campo label {
-    font-size: 18px;
-    font-weight: bolder;
     text-align: left;
 }
-
-/* Estilo para todos os inputs de texto, data e passwords */
-input[type="text"], 
-input[type="password"], 
-input[type="email"], 
-input[type="tel"], 
-input[type="date"], 
-select {
-    width: 100%;
+input, select {
     height: 3.5rem;
     font-size: 18px;
     border-radius: 10px;
-    border: 1px solid white;
-    padding: 0 15px;
-    background-color: white;
-    color: #333;
-    outline: none;
-}
-
-/* Inputs específicos do PIN máis centrados */
-#pin-input {
-    text-align: center;
-    letter-spacing: 10px;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-/* Estilo para o canvas da firma e vídeo */
-canvas, video {
-    max-width: 100%;
-    height: auto;
-    border: 2px solid white;
-    background-color: #000;
-    border-radius: 20px;
-    margin: 10px 0;
-}
-
-button {
-    display: block;
-    width: 90%;
-    max-width: 500px;
-    text-transform: uppercase;
-    font-weight: bolder;
-    padding: 2rem;
-    margin: 15px auto;
-    cursor: pointer;
-    background-color: rgb(223, 195, 159); /* Cor Ouro/Arena orixinal */
     border: none;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    border-radius: 20px;
-    font-size: 18px;
-    transition: all 0.2s;
-    color: #333;
+    padding: 0 10px;
 }
-
-button:active {
-    background-color: #94acc2;
-    transform: scale(0.96);
-}
-
-/* Botón de limpar firma e secundarios */
-button[onclick*="limpar"], 
-button[onclick*="volver"] {
-    padding: 1rem;
-    font-size: 14px;
-    width: 60%;
-    background-color: #7f8c8d;
-    color: white;
-}
-
-/* Botóns de acción especial no panel final */
-#btn-pin-accion, #btn-foto-accion {
-    background-color: #2ecc71;
-    color: white;
+button {
+    width: 90%;
     padding: 1.5rem;
+    margin: 10px auto;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 20px;
+    border: none;
+    background-color: rgb(223, 195, 159);
+    cursor: pointer;
+    text-transform: uppercase;
 }
-
-/* Estilo para a mensaxe de éxito/erro */
-#mensaje-acceso {
-    padding: 10px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-/* Animación para a mensaxe de CAJÓN ABIERTO */
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
-#mensaje-acceso h2 {
-    animation: blink 1s infinite;
-}
+button:active { transform: scale(0.98); background-color: #ccc; }
+canvas { border: 1px solid white; margin-top: 10px; width: 100%; }

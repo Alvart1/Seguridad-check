@@ -21,11 +21,9 @@
 
     <div id="seccion-formulario" class="viajero-bloque" style="display: none; width: 100%;">
         <h2 id="titulo-formulario" style="text-align: center; margin-top: 20px;">Datos del Viajero 1</h2>
-        
         <form id="formulario">
             <div class="campo"><label>Nombre:</label><input type="text" id="nombre" required></div>
             <div class="campo"><label>Apellidos:</label><input type="text" id="apellidos" required></div>
-
             <div class="campo">
                 <label>Género:</label>
                 <select id="genero" required>
@@ -34,7 +32,6 @@
                     <option value="otro">Otro</option>
                 </select>
             </div>
-
             <div class="campo">
                 <label>Tipo Documento:</label>
                 <select id="tipo_documento" required>
@@ -43,7 +40,6 @@
                     <option value="pasaporte">Pasaporte</option>
                 </select>
             </div>
-
             <div class="campo"><label>Código documento:</label><input type="text" id="documento" required></div>
             <div class="campo"><label>Teléfono:</label><input type="tel" id="tlf"></div>
             <div class="campo"><label>Dirección:</label><input type="text" id="direccion" required></div>
@@ -55,10 +51,9 @@
             <div class="campo" style="flex-direction: column; align-items: center;">
                 <label>Firma:</label>
                 <canvas id="canvas-firma" width="350" height="200" style="border: 2px solid #000; cursor: crosshair; background-color: aliceblue; border-radius: 10px;"></canvas>
-                <button type="button" onclick="limparFirma()" style="padding: 1rem; width: 50%; font-size: 14px; margin-top: 10px;">Limpiar Firma</button>
+                <button type="button" onclick="limparFirma()" style="padding: 10px; width: 50%; font-size: 14px; margin-top: 10px; background-color: #7f8c8d; color: white;">Limpiar Firma</button>
             </div>
-
-            <button type="submit" style="margin-top: 20px;">Enviar Registro</button>
+            <button type="submit" style="background-color: #2ecc71;">Enviar Registro</button>
         </form>
     </div>
 
@@ -67,21 +62,20 @@
         
         <div id="opcion-crear-metodo" style="display: none; flex-direction: column; gap: 15px; align-items: center;">
             <h3>Configura tu llave de acceso</h3>
-            <p style="font-size: 0.9rem; color: #ccc;">Elige un método. El otro quedará anulado para esta estancia.</p>
-            <button onclick="prepararConfiguracion('pin')" style="width: 80%; background-color: #27ae60; padding: 15px;">Crear PIN de Usuario</button>
-            <button onclick="prepararConfiguracion('foto')" style="width: 80%; background-color: #8e44ad; padding: 15px;">Registrar mi Foto</button>
+            <button onclick="prepararConfiguracion('pin')" style="width: 80%; background-color: #27ae60;">Crear PIN de Usuario</button>
+            <button onclick="prepararConfiguracion('foto')" style="width: 80%; background-color: #8e44ad;">Registrar mi Foto</button>
         </div>
 
         <div id="seleccion-metodo" style="display: none; flex-direction: column; gap: 15px; align-items: center;">
             <button onclick="clickEnChaves()" style="width: 80%; padding: 25px; background-color: #3498db; font-size: 1.2rem;">🗝️ LLAVES (ABRIR)</button>
             <hr style="width: 80%; border: 0.5px solid #555; margin: 20px 0;">
-            <button onclick="finEstancia()" style="width: 60%; background-color: #e74c3c; font-size: 14px;">🚩 Finalizar Estancia</button>
+            <button onclick="finEstancia()" style="width: 60%; background-color: #e74c3c; font-size: 14px; color: white;">🚩 Finalizar Estancia</button>
         </div>
 
         <div id="metodo-pin" style="display: none; margin-top: 20px;">
-            <h3 id="titulo-pin">Introduce tus datos</h3>
+            <h3 id="titulo-pin">Acceso con PIN</h3>
             <input type="text" id="nombre-pin" placeholder="Tu nombre/usuario">
-            <input type="password" id="pin-input" placeholder="PIN de estancia" maxlength="4">
+            <input type="password" id="pin-input" placeholder="Tu PIN (4 cifras)" maxlength="4">
             <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
                 <button id="btn-pin-accion" onclick="procesarPin()" style="background-color: #2ecc71;">Listo</button>
                 <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
