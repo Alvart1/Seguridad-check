@@ -2,13 +2,22 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Registro y Acceso Apartamento</title>
     <link rel="stylesheet" href="css/estilo-formulario.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<div id="pantalla-negra" onclick="despertarTablet()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; cursor: pointer;"></div>
+
+    <div id="pantalla-negra" onclick="despertarTablet()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; cursor: pointer;"></div>
+
+    <div id="bloqueo-tablet" class="encabezado" style="display: none;">
+        <h1>Tablet Bloqueada</h1>
+        <p>Introduce el PIN para gestionar el check-in</p>
+        <input type="password" id="pin-propietario" placeholder="****" style="text-align: center; margin: 20px 0; font-size: 2rem; width: 60%;">
+        <button onclick="validarPinTablet()" style="background-color: #2ecc71;">Desbloquear</button>
+    </div>
+
     <div id="paso-inicio" class="encabezado" style="display: none;">
         <h1>¿Cuántos huéspedes son?</h1>
         <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
@@ -32,66 +41,27 @@
                     <option value="otro">Otro</option>
                 </select>
             </div>
-            <div class="campo">
-                <label>Tipo Documento:</label>
-                <select id="tipo_documento" required>
-                    <option value="dni">DNI</option>
-                    <option value="nie">NIE</option>
-                    <option value="pasaporte">Pasaporte</option>
-                </select>
-            </div>
-            <div class="campo"><label>Código documento:</label><input type="text" id="documento" required></div>
-            <div class="campo"><label>Teléfono:</label><input type="tel" id="tlf"></div>
+            <div class="campo"><label>DNI / Pasaporte:</label><input type="text" id="documento" required></div>
             <div class="campo"><label>Dirección:</label><input type="text" id="direccion" required></div>
             <div class="campo"><label>Fecha nacimiento:</label><input type="date" id="fecha_nac" required></div>
-            <div class="campo"><label>Soporte DNI:</label><input type="text" id="soporte" maxlength="6" required></div>
             <div class="campo"><label>Email:</label><input type="email" id="correo" required></div>
-            <div class="campo"><label>Nacionalidad:</label><input type="text" id="nacionalidad" required></div>
 
             <div class="campo" style="flex-direction: column; align-items: center;">
                 <label>Firma:</label>
-                <canvas id="canvas-firma" width="350" height="200" style="border: 2px solid #000; cursor: crosshair; background-color: aliceblue; border-radius: 10px;"></canvas>
+                <canvas id="canvas-firma" width="350" height="200" style="border: 2px solid #fff; background-color: aliceblue; border-radius: 10px;"></canvas>
                 <button type="button" onclick="limparFirma()" style="padding: 10px; width: 50%; font-size: 14px; margin-top: 10px; background-color: #7f8c8d; color: white;">Limpiar Firma</button>
             </div>
-            <button type="submit" style="background-color: #2ecc71;">Enviar Registro</button>
+            <button type="submit" style="background-color: #2ecc71;">Enviar y Continuar</button>
         </form>
     </div>
 
-    <div id="seccion-final" style="display: none;" class="encabezado">
-        <h1 id="titulo-panel">Panel de Estancia</h1>
-        
-        <div id="opcion-crear-metodo" style="display: none; flex-direction: column; gap: 15px; align-items: center;">
-            <h3>Configura tu llave de acceso</h3>
-            <button onclick="prepararConfiguracion('pin')" style="width: 80%; background-color: #27ae60;">Crear PIN de Usuario</button>
-            <button onclick="prepararConfiguracion('foto')" style="width: 80%; background-color: #8e44ad;">Registrar mi Foto</button>
+    <div id="seccion-final" class="encabezado" style="display: none;">
+        <h1>Panel de Estancia</h1>
+        <div id="seleccion-metodo" style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+            <button onclick="clickEnChaves()" style="width: 80%; padding: 25px; background-color: #3498db; font-size: 1.2rem;">🗝️ ABRIR CAJÓN</button>
+            <hr style="width: 80%; border: 0.5px solid #555; margin: 10px 0;">
+            <button onclick="finEstancia()" style="width: 60%; background-color: #e74c3c; color: white;">🚩 Finalizar Estancia</button>
         </div>
-
-        <div id="seleccion-metodo" style="display: none; flex-direction: column; gap: 15px; align-items: center;">
-            <button onclick="clickEnChaves()" style="width: 80%; padding: 25px; background-color: #3498db; font-size: 1.2rem;">🗝️ LLAVES (ABRIR)</button>
-            <hr style="width: 80%; border: 0.5px solid #555; margin: 20px 0;">
-            <button onclick="finEstancia()" style="width: 60%; background-color: #e74c3c; font-size: 14px; color: white;">🚩 Finalizar Estancia</button>
-        </div>
-
-        <div id="metodo-pin" style="display: none; margin-top: 20px;">
-            <h3 id="titulo-pin">Acceso con PIN</h3>
-            <input type="text" id="nombre-pin" placeholder="Tu nombre/usuario">
-            <input type="password" id="pin-input" placeholder="Tu PIN (4 cifras)" maxlength="4">
-            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                <button id="btn-pin-accion" onclick="procesarPin()" style="background-color: #2ecc71;">Listo</button>
-                <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
-            </div>
-        </div>
-
-        <div id="metodo-foto" style="display: none; margin-top: 20px;">
-            <h3 id="titulo-foto">Identificación Facial</h3>
-            <video id="video" width="320" height="240" autoplay style="border-radius: 10px; border: 2px solid white; background: #000;"></video>
-            <canvas id="canvas-foto" style="display:none;" width="320" height="240"></canvas>
-            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                <button id="btn-foto-accion" onclick="procesarFoto()" style="background-color: #9b59b6;">Capturar</button>
-                <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
-            </div>
-        </div>
-
         <p id="mensaje-acceso" style="color: #f1c40f; font-weight: bold; margin-top: 20px; font-size: 1.2rem; min-height: 1.5em;"></p>
     </div>
 
