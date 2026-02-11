@@ -204,4 +204,50 @@ async function abrirCaixon(nome, metodo) {
     try {
         const res = await fetch(`http://${ip}:8080/abrir`, { mode: 'cors' });
         if (res.ok) {
-            await _
+            await _supabase.from('accesos_llaves').insert([{ nombre_usuario: nome, metodo_acceso: metodo }]);
+            document.getElementById('mensaje-acceso').innerHTML = "<h2 style='color: #2ecc71;'>✅ CAJÓN ABIERTO</h2>";
+            setTimeout(() => { 
+                verificarEstado(); 
+            }, 5000);
+            return true;
+        }
+    } catch (e) { alert("Error con la Raspberry"); return false; }
+}
+
+function volverAlPanel() { verificarEstado(); }
+
+async function iniciarCamara() {
+    try {
+        streamCamara = await navigator.mediaDevices.getUserMedia({ video: true });
+        document.getElementById('video').srcObject = streamCamara;
+    } catch (e) { alert("Error cámara"); }
+}
+
+function pararCamara() {
+    if (streamCamara) {
+        streamCamara.getTracks().forEach(t => t.stop());
+        streamCamara = null;
+    }
+}
+
+function capturarFrame() {
+    const v = document.getElementById('video'), c = document.getElementById('canvas-foto');
+    c.getContext('2d').drawImage(v, 0, 0, 320, 240);
+    return c.toDataURL('image/png');
+}
+
+function limparFirma() { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); }
+
+// Debuxar firma
+let debuxando = false;
+if(canvasFirma){
+    canvasFirma.addEventListener('mousedown', () => debuxando = true);
+    canvasFirma.addEventListener('mouseup', () => { debuxando = false; ctxFirma.beginPath(); });
+    canvasFirma.addEventListener('mousemove', (e) => {
+        if (!debuxando) return;
+        const rect = canvasFirma.getBoundingClientRect();
+        ctxFirma.lineWidth = 2; ctxFirma.lineCap = 'round';
+        ctxFirma.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctxFirma.stroke();
+    });
+}
