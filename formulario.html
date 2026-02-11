@@ -61,28 +61,36 @@
     </div>
 
    <div id="seccion-final" style="display: none;" class="encabezado">
-    <h1>Acceso a Llaves</h1>
+    <h1 id="titulo-panel">Panel de Estancia</h1>
     
-    <div id="seleccion-metodo">
-        <p>¿Cómo quieres identificarte?</p>
-        <button onclick="mostrarMetodo('pin')">Usar PIN</button>
-        <button onclick="mostrarMetodo('foto')">Usar Foto</button>
+    <div id="seleccion-metodo" style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+        <button onclick="mostrarMetodo('pin')" style="width: 80%; padding: 20px; background-color: #3498db;">🗝️ ABRIR CON PIN</button>
+        <button onclick="mostrarMetodo('foto')" style="width: 80%; padding: 20px; background-color: #9b59b6;">📸 ABRIR CON FOTO</button>
+        <hr style="width: 80%; border: 0.5px solid #555; margin: 20px 0;">
+        <button onclick="pecharSesion()" style="width: 60%; background-color: #e74c3c; font-size: 14px;">🚩 Finalizar Estancia</button>
     </div>
 
     <div id="metodo-pin" style="display: none; margin-top: 20px;">
+        <h3>Introduce tu PIN de Usuario</h3>
         <input type="text" id="nombre-pin" placeholder="Tu nombre">
-        <input type="password" id="pin-input" placeholder="PIN (1234)" maxlength="4">
-        <button onclick="accederConPin()">Validar Acceso</button>
+        <input type="password" id="pin-input" placeholder="PIN de estancia" maxlength="4">
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+            <button onclick="accederConPin()">Validar</button>
+            <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
+        </div>
     </div>
 
     <div id="metodo-foto" style="display: none; margin-top: 20px;">
-        <input type="text" id="nombre-foto" placeholder="Tu nombre">
-        <video id="video" width="320" height="240" autoplay style="border-radius: 10px;"></video>
-        <button onclick="accederConFoto()">📸 Capturar y Abrir</button>
+        <h3>Identificación Facial</h3>
+        <video id="video" width="320" height="240" autoplay style="border-radius: 10px; border: 2px solid white;"></video>
         <canvas id="canvas-foto" style="display:none;" width="320" height="240"></canvas>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+            <button onclick="accederConFoto()">Capturar y Abrir</button>
+            <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
+        </div>
     </div>
 
-    <p id="mensaje-acceso" style="color: yellow;"></p>
+    <p id="mensaje-acceso" style="color: yellow; font-weight: bold; margin-top: 20px;"></p>
 </div>
 
     <script src="js/formulario.js"></script>
