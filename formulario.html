@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
+    <title>Registro y Acceso</title>
     <link rel="stylesheet" href="css/estilo-formulario.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -19,11 +20,9 @@
 
     <div id="seccion-formulario" class="viajero-bloque" style="display: none; width: 100%;">
         <h2 id="titulo-formulario" style="text-align: center; margin-top: 20px;">Datos del Viajero 1</h2>
-        
         <form id="formulario">
             <div class="campo"><label>Nombre:</label><input type="text" id="nombre" required></div>
             <div class="campo"><label>Apellidos:</label><input type="text" id="apellidos" required></div>
-
             <div class="campo">
                 <label>Género:</label>
                 <select id="genero" required>
@@ -32,7 +31,6 @@
                     <option value="otro">Otro</option>
                 </select>
             </div>
-
             <div class="campo">
                 <label>Tipo Documento:</label>
                 <select id="tipo_documento" required>
@@ -41,7 +39,6 @@
                     <option value="pasaporte">Pasaporte</option>
                 </select>
             </div>
-
             <div class="campo"><label>Código documento:</label><input type="text" id="documento" required></div>
             <div class="campo"><label>Teléfono:</label><input type="tel" id="tlf"></div>
             <div class="campo"><label>Dirección:</label><input type="text" id="direccion" required></div>
@@ -53,45 +50,49 @@
             <div class="campo" style="align-items: center;">
                 <label>Firma:</label>
                 <canvas id="canvas-firma" width="350" height="200" style="border: 2px solid #000; cursor: crosshair; background-color: aliceblue; border-radius: 10px;"></canvas>
-                <button type="button" onclick="limpar()" style="padding: 1rem; width: 50%; font-size: 14px; margin-top: 10px;">Limpar Firma</button>
+                <button type="button" onclick="limparFirma()" style="padding: 1rem; width: 50%; font-size: 14px; margin-top: 10px;">Limpiar Firma</button>
             </div>
-
             <button type="submit">Enviar Registro</button>
         </form>
     </div>
 
-   <div id="seccion-final" style="display: none;" class="encabezado">
-    <h1 id="titulo-panel">Panel de Estancia</h1>
-    
-    <div id="seleccion-metodo" style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
-        <button onclick="mostrarMetodo('pin')" style="width: 80%; padding: 20px; background-color: #3498db;">🗝️ ABRIR CON PIN</button>
-        <button onclick="mostrarMetodo('foto')" style="width: 80%; padding: 20px; background-color: #9b59b6;">📸 ABRIR CON FOTO</button>
-        <hr style="width: 80%; border: 0.5px solid #555; margin: 20px 0;">
-        <button onclick="pecharSesion()" style="width: 60%; background-color: #e74c3c; font-size: 14px;">🚩 Finalizar Estancia</button>
-    </div>
-
-    <div id="metodo-pin" style="display: none; margin-top: 20px;">
-        <h3>Introduce tu PIN de Usuario</h3>
-        <input type="text" id="nombre-pin" placeholder="Tu nombre">
-        <input type="password" id="pin-input" placeholder="PIN de estancia" maxlength="4">
-        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-            <button onclick="accederConPin()">Validar</button>
-            <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
+    <div id="seccion-final" style="display: none;" class="encabezado">
+        <h1 id="titulo-panel">Panel de Estancia</h1>
+        
+        <div id="opcion-crear-metodo" style="display: none; flex-direction: column; gap: 15px; align-items: center;">
+            <h3>Configura tu acceso</h3>
+            <button onclick="prepararConfiguracion('pin')" style="width: 80%; background-color: #27ae60;">Crear PIN de Usuario</button>
+            <button onclick="prepararConfiguracion('foto')" style="width: 80%; background-color: #8e44ad;">Registrar mi Foto</button>
         </div>
-    </div>
 
-    <div id="metodo-foto" style="display: none; margin-top: 20px;">
-        <h3>Identificación Facial</h3>
-        <video id="video" width="320" height="240" autoplay style="border-radius: 10px; border: 2px solid white;"></video>
-        <canvas id="canvas-foto" style="display:none;" width="320" height="240"></canvas>
-        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-            <button onclick="accederConFoto()">Capturar y Abrir</button>
-            <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
+        <div id="seleccion-metodo" style="display: none; flex-direction: column; gap: 15px; align-items: center;">
+            <button onclick="clickEnChaves()" style="width: 80%; padding: 20px; background-color: #3498db;">🗝️ LLAVES</button>
+            <hr style="width: 80%; border: 0.5px solid #555; margin: 10px 0;">
+            <button onclick="finEstancia()" style="width: 60%; background-color: #e74c3c; font-size: 14px;">🚩 Finalizar Estancia</button>
         </div>
-    </div>
 
-    <p id="mensaje-acceso" style="color: yellow; font-weight: bold; margin-top: 20px;"></p>
-</div>
+        <div id="metodo-pin" style="display: none; margin-top: 20px;">
+            <h3 id="titulo-pin">Introduce tus datos</h3>
+            <input type="text" id="nombre-pin" placeholder="Tu nombre/usuario">
+            <input type="password" id="pin-input" placeholder="PIN de estancia" maxlength="4">
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button id="btn-pin-accion" onclick="procesarPin()">Listo</button>
+                <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
+            </div>
+        </div>
+
+        <div id="metodo-foto" style="display: none; margin-top: 20px;">
+            <h3 id="titulo-foto">Identificación Facial</h3>
+            <video id="video" width="320" height="240" autoplay style="border-radius: 10px; border: 2px solid white;"></video>
+            <canvas id="canvas-foto" style="display:none;" width="320" height="240"></canvas>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button id="btn-foto-accion" onclick="procesarFoto()">Capturar</button>
+                <button onclick="volverAlPanel()" style="background-color: #7f8c8d;">Volver</button>
+            </div>
+        </div>
+
+        <p id="mensaje-acceso" style="color: yellow; font-weight: bold; margin-top: 20px;"></p>
+    </div>
 
     <script src="js/formulario.js"></script>
 </body>
