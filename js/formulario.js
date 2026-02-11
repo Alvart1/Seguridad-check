@@ -28,6 +28,13 @@ window.onload = function() {
     }
 };
 
+// --- LIMPEZA DE INPUTS ---
+function limpiarInputsAcceso() {
+    document.getElementById('nombre-pin').value = "";
+    document.getElementById('pin-input').value = "";
+    document.getElementById('mensaje-acceso').innerText = "";
+}
+
 function verificarEstado() {
     const rexistrado = localStorage.getItem('hospede_rexistrado');
     if (rexistrado === 'true') {
@@ -35,11 +42,12 @@ function verificarEstado() {
         seccionForm.style.display = 'none';
         seccionFinal.style.display = 'block';
         
-        // Menú principal [Chaves] [Fin Estancia]
+        // Reset visual e limpeza de datos residuais
         document.getElementById('seleccion-metodo').style.display = 'flex';
         document.getElementById('opcion-crear-metodo').style.display = 'none';
         document.getElementById('metodo-pin').style.display = 'none';
         document.getElementById('metodo-foto').style.display = 'none';
+        limpiarInputsAcceso();
         pararCamara();
     }
 }
@@ -89,9 +97,9 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
 function clickEnChaves() {
     const metodoElexido = localStorage.getItem('metodo_preferido');
     document.getElementById('seleccion-metodo').style.display = 'none';
+    limpiarInputsAcceso(); // Limpamos sempre ao entrar
 
     if (!metodoElexido) {
-        // Se non hai método, preguntamos cal quere crear
         document.getElementById('opcion-crear-metodo').style.display = 'flex';
     } else if (metodoElexido === 'pin') {
         document.getElementById('metodo-pin').style.display = 'block';
@@ -100,15 +108,16 @@ function clickEnChaves() {
     } else {
         document.getElementById('metodo-foto').style.display = 'block';
         document.getElementById('titulo-foto').innerText = "Escaneando rostro...";
-        document.getElementById('btn-foto-accion').style.display = 'none'; // Auto-scan
+        document.getElementById('btn-foto-accion').style.display = 'none'; 
         iniciarCamara().then(() => {
-            setTimeout(procesarFoto, 2000); // 2 segundos e abre
+            setTimeout(procesarFoto, 2000); 
         });
     }
 }
 
 function prepararConfiguracion(tipo) {
     document.getElementById('opcion-crear-metodo').style.display = 'none';
+    limpiarInputsAcceso();
     if (tipo === 'pin') {
         document.getElementById('metodo-pin').style.display = 'block';
         document.getElementById('titulo-pin').innerText = "Crea tu Usuario y PIN";
@@ -116,6 +125,7 @@ function prepararConfiguracion(tipo) {
     } else {
         document.getElementById('metodo-foto').style.display = 'block';
         document.getElementById('titulo-foto').innerText = "Captura tu foto de registro";
+        document.getElementById('btn-foto-accion').style.display = 'inline-block';
         document.getElementById('btn-foto-accion').innerText = "Capturar y Guardar";
         iniciarCamara();
     }
@@ -132,14 +142,17 @@ async function procesarPin() {
             localStorage.setItem('user_estancia', user);
             localStorage.setItem('pass_estancia', pin);
             await _supabase.from('accesos_llaves').insert([{ nombre_usuario: user, metodo_acceso: 'REGISTRO_PIN' }]);
-            alert("Cuenta creada correctamente");
-            verificarEstado();
+            alert("Cuenta creada correctamente. Vuelve a introducir los datos para entrar.");
+            verificarEstado(); // Isto limpa os inputs automaticamente
+        } else {
+            alert("Por favor, cubre ambos campos.");
         }
     } else {
         if (user === localStorage.getItem('user_estancia') && pin === localStorage.getItem('pass_estancia')) {
             await abrirCaixon(user, 'ACCESO_PIN');
         } else {
             alert("Usuario o PIN incorrecto");
+            limpiarInputsAcceso();
         }
     }
 }
@@ -155,7 +168,6 @@ async function procesarFoto() {
         alert("Foto registrada correctamente");
         verificarEstado();
     } else {
-        // Simulación: Se a foto existe no localstorage, abrimos
         if (localStorage.getItem('foto_referencia')) {
             await abrirCaixon('Usuario_Foto', 'ACCESO_FOTO');
         } else {
@@ -170,7 +182,13 @@ async function finEstancia() {
     if (confirm("¿Finalizar estancia? Se abrirá el cajón y se borrarán tus datos.")) {
         const ok = await abrirCaixon('Sistema', 'FIN_ESTANCIA');
         if (ok) {
-            document.getElementById('seccion-final').innerHTML = "<h1>¡Vuelva pronto!</h1><p>Esperamos que haya disfrutado la estancia aquí.</p>";
+            // Mensaxe final
+            document.getElementById('seccion-final').innerHTML = `
+                <div style="text-align:center; padding: 50px;">
+                    <h1>¡Vuelva pronto!</h1>
+                    <p style="font-size: 1.2rem;">Esperamos que haya disfrutado la estancia aquí.</p>
+                </div>
+            `;
             setTimeout(() => {
                 localStorage.clear();
                 sessionStorage.clear();
@@ -186,43 +204,4 @@ async function abrirCaixon(nome, metodo) {
     try {
         const res = await fetch(`http://${ip}:8080/abrir`, { mode: 'cors' });
         if (res.ok) {
-            await _supabase.from('accesos_llaves').insert([{ nombre_usuario: nome, metodo_acceso: metodo }]);
-            document.getElementById('mensaje-acceso').innerText = "✅ CAJÓN ABIERTO";
-            setTimeout(() => { document.getElementById('mensaje-acceso').innerText = ""; verificarEstado(); }, 5000);
-            return true;
-        }
-    } catch (e) { alert("Error con la Raspberry"); return false; }
-}
-
-function volverAlPanel() { verificarEstado(); }
-
-async function iniciarCamara() {
-    try {
-        streamCamara = await navigator.mediaDevices.getUserMedia({ video: true });
-        document.getElementById('video').srcObject = streamCamara;
-    } catch (e) { alert("Error cámara"); }
-}
-
-function pararCamara() {
-    if (streamCamara) streamCamara.getTracks().forEach(t => t.stop());
-}
-
-function capturarFrame() {
-    const v = document.getElementById('video'), c = document.getElementById('canvas-foto');
-    c.getContext('2d').drawImage(v, 0, 0, 320, 240);
-    return c.toDataURL('image/png');
-}
-
-function limparFirma() { ctxFirma.clearRect(0, 0, canvasFirma.width, canvasFirma.height); }
-
-// Debuxar firma
-let debuxando = false;
-canvasFirma.addEventListener('mousedown', () => debuxando = true);
-canvasFirma.addEventListener('mouseup', () => { debuxando = false; ctxFirma.beginPath(); });
-canvasFirma.addEventListener('mousemove', (e) => {
-    if (!debuxando) return;
-    const rect = canvasFirma.getBoundingClientRect();
-    ctxFirma.lineWidth = 2; ctxFirma.lineCap = 'round';
-    ctxFirma.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-    ctxFirma.stroke();
-});
+            await _
