@@ -20,7 +20,7 @@ function verificarYGenerar() {
 
         if (xaRexistrado === 'true') {
             // REVISA ESTE NOME: Debe coincidir exactamente co teu ficheiro .html
-            window.location.href = "acceso-chaves.html"; 
+            window.location.href = "acceso-llaves.html"; 
         } else {
             // Xeramos o QR
             contenedorQR.innerHTML = ""; 
