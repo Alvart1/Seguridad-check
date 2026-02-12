@@ -1,0 +1,9 @@
+*{
+    margin: o;
+    padding: 0;
+}
+body{
+    background-color: rgb(0, 132, 255);
+    font-family: Arial, Helvetica, sans-serif;
+    text-transform: uppercase;
+}
