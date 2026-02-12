@@ -21,7 +21,7 @@ function verificarYGenerar() {
 
         if (xaRexistrado === 'true') {
             // Se xa está rexistrado, imos directo á interface de chaves
-            window.location.href = "chaves.html";
+            window.location.href = "acceso-llaves.html";
         } else {
             // Se é a primeira vez, xeramos o QR para o formulario
             contenedorQR.innerHTML = ""; // Limpar QR previo se existe
