@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar Acceso a las llaves</title>
+    <link rel="stylesheet" href="css/crear-cuenta.css">
+</head>
+<body>
+
+    <div class="panel">
+        <div class="titulo">
+            <h1>Configura tu Acceso</h1>
+        </div>
+
+        <p>Has completado el registro. Ahora, elige cómo prefieres abrir el cajón de las llaves durante tu estancia:</p>
+
+        <div class="opciones-acceso">
+            <button type="button" class="btn-metodo" onclick="elixirMetodo('pin')">
+                <span class="texto">Usuario y PIN</span>
+            </button>
+
+            <button type="button" class="btn-metodo" onclick="elixirMetodo('foto')">
+                <span class="texto">Reconocimiento Facial</span>
+            </button>
+        </div>
+
+        <p class="nota">Este será tu único método de apertura hasta que finalices tu estancia.</p>
+    </div>
+
+    <script src="js/crear-conta.js"></script>
+</body>
+</html>

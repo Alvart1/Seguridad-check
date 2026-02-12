@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Llaves</title>
+    <link rel="stylesheet" href="css/crear-cuenta-llaves.css">
+</head>
+<body>
+
+    <div class="panel">
+        <div class="titulo">
+            <h1 id="texto-titulo">Cajón de Llaves</h1>
+        </div>
+
+        <div id="interfaz-dinamica" class="contenedor-accion">
+            <p>Cargando configuración de acceso...</p>
+        </div>
+
+        <div class="zona-inferior">
+            <p id="mensaje-estado" style="margin-bottom: 10px; color: #2ecc71; font-weight: bold;"></p>
+            
+            <hr style="opacity: 0.2; margin-bottom: 20px;">
+            
+            <button type="button" class="btn-finalizar" onclick="confirmarFinEstancia()">
+                Finalizar Estancia
+            </button>
+        </div>
+    </div>
+
+    <script src="js/acceso-chaves.js"></script>
+</body>
+</html>

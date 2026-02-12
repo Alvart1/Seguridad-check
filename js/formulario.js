@@ -5,25 +5,20 @@ const _supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
 
 let totalHospedes = 0, hospedeActual = 1, reservaId = null;
 
-// --- CONTROL DE ACCESO E ESTADO ---
+// --- CONTROL DE ACCESO ---
 window.onload = function() {
-    // Se non hai rexistro previo, amosamos o paso inicial (cantos son)
-    verificarEstado();
+    // Seguridade: Se non puxeron o PIN no index, de volta ao inicio
+    if (!sessionStorage.getItem('tablet_desbloqueada')) {
+        window.location.href = "index.html";
+        return;
+    }
+    mostrarSeccion('paso-inicio');
 };
 
 function mostrarSeccion(id) {
     document.querySelectorAll('.encabezado, .viajero-bloque').forEach(sec => sec.style.display = 'none');
     const elemento = document.getElementById(id);
     if (elemento) elemento.style.display = 'block';
-}
-
-function verificarEstado() {
-    const rexistrado = localStorage.getItem('hospede_rexistrado');
-    if (rexistrado === 'true') {
-        mostrarSeccion('seccion-final');
-    } else {
-        mostrarSeccion('paso-inicio');
-    }
 }
 
 // --- PROCESO DE REXISTRO ---
@@ -61,41 +56,19 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
         if (hospedeActual < totalHospedes) {
             hospedeActual++;
             document.getElementById('formulario').reset();
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            limparFirma();
             document.getElementById('titulo-formulario').innerText = `Datos del Viajero ${hospedeActual}`;
         } else {
+            // CAMBIO CLAVE: Ao rematar, gardamos e imos á Interface 3 (Crear Conta)
             localStorage.setItem('hospede_rexistrado', 'true');
-            verificarEstado();
+            window.location.href = "crear-conta.html";
         }
     } else {
         alert("Erro ao gardar: " + error.message);
     }
 });
 
-// --- ACCIÓNS DO PANEL FINAL ---
-async function clickEnChaves() {
-    try {
-        const res = await fetch(`http://10.158.13.63:8080/abrir`);
-        if (res.ok) {
-            document.getElementById('mensaje-acceso').innerText = "✅ CAJÓN ABIERTO";
-            setTimeout(() => { document.getElementById('mensaje-acceso').innerText = ""; }, 5000);
-        }
-    } catch (e) { 
-        alert("Erro ao abrir o caixón. Comproba a conexión co hardware."); 
-    }
-}
-
-// ESTA É A FUNCIÓN QUE BUSCABAS: Borra todo e volve ao index.html
-async function finEstancia() {
-    if (confirm("¿Finalizar estancia? Se borrarán todos los datos y volverás al inicio.")) {
-        // 1. Limpamos o rexistro do cliente
-        localStorage.clear();
-        // 2. Rediriximos á pantalla de Benvida/PIN
-        window.location.href = "index.html";
-    }
-}
-
-// --- LÓXICA DA FIRMA ---
+// --- LÓXICA DA FIRMA (O teu código que xa funciona) ---
 const canvas = document.getElementById('canvas-firma');
 const ctx = canvas.getContext('2d');
 let debuxando = false;
@@ -110,7 +83,6 @@ canvas.addEventListener('mousemove', (e) => {
     ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
     ctx.stroke();
 });
-// Soporte táctil para tablet
 canvas.addEventListener('touchstart', (e) => { debuxando = true; e.preventDefault(); });
 canvas.addEventListener('touchmove', (e) => {
     if (!debuxando) return;
@@ -120,3 +92,10 @@ canvas.addEventListener('touchmove', (e) => {
     ctx.stroke();
 });
 canvas.addEventListener('touchend', () => { debuxando = false; ctx.beginPath(); });
+
+// --- TIMER INACTIVIDADE ---
+let tempoInactividade = setTimeout(() => window.location.href = "index.html", 300000);
+document.onmousedown = () => {
+    clearTimeout(tempoInactividade);
+    tempoInactividade = setTimeout(() => window.location.href = "index.html", 300000);
+};
