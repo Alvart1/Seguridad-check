@@ -45,15 +45,17 @@ async function guardarYVolver(metodo) {
         console.log("Enviando datos a Supabase...");
 
         // Usamos comiñas para asegurar que os nomes con acentos non dean problemas
-        const { data, error } = await _supabase
-            .from('accesos_llaves')
-            .insert([
-                { 
-                    "Nombre_usuario": nombreFinal,
-                    "método_acceso": metodo, 
-                    "foto_base64": valorAcceso 
-                }
-            ]);
+        // ... dentro da función guardarYVolver ...
+const { data, error } = await _supabase
+    .from('accesos_llaves')
+    .insert([
+        { 
+            // Proba con estes nomes exactamente
+            "nombre_usuario": nombreFinal, 
+            "método_acceso": metodo, 
+            "foto_base64": valorAcceso 
+        }
+    ]);
 
         if (error) {
             // Se Supabase rexeita a entrada (ex: RLS bloqueado)
