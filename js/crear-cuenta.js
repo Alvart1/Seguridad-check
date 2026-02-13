@@ -1,75 +1,41 @@
-/**
- * js/crear-cuenta.js
- * Lóxica para rexistrar o hóspede en Supabase e LocalStorage
- */
-
-// 1. CONFIGURACIÓN DA TÚA BASE DE DATOS
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
-
-// Inicializamos o cliente de Supabase
 const _supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
 
-// 2. FUNCIÓN PARA CAMBIAR DE VISTA (PIN ou FOTO)
-function mostrarFormulario(tipo) {
-    // Limpamos os campos para que non haxa rastro de clientes anteriores
-    if (document.getElementById('nombre-pin')) document.getElementById('nombre-pin').value = "";
-    if (document.getElementById('pin-valor')) document.getElementById('pin-valor').value = "";
-
-    // Ocultamos o selector principal
-    document.getElementById('paso-seleccion').style.display = 'none';
-    
-    // Amosamos o bloque que corresponde
-    if(tipo === 'pin') {
-        document.getElementById('form-pin').style.display = 'block';
-    } else {
-        document.getElementById('form-foto').style.display = 'block';
-    }
-}
-
-// 3. FUNCIÓN PARA GARDAR EN SUPABASE E VOLVER
 async function guardarYVolver(metodo) {
-    // Collermos os valores dos inputs
     const nombre = (metodo === 'pin') ? document.getElementById('nombre-pin').value : "Usuario_Foto";
-    const pinDefinido = (metodo === 'pin') ? document.getElementById('pin-valor').value : "0000";
+    const pinDefinido = (metodo === 'pin') ? document.getElementById('pin-valor').value : "";
 
-    // Validación básica
     if (metodo === 'pin' && (nombre === "" || pinDefinido.length < 4)) {
         alert("Por favor, rellena tu nombre y un PIN de 4 cifras");
         return;
     }
 
     try {
-        // --- AQUÍ ESTÁ O VÍNCULO REAL COA BASE DE DATOS ---
+        // GARDAR NA TÚA TÁBOA REAL: accesos_llaves
         const { data, error } = await _supabase
-            .from('hospedes') // Nome da túa táboa en Supabase
+            .from('accesos_llaves') // Nome exacto da túa táboa na imaxe
             .insert([
                 { 
-                    nombre: nombre, 
-                    pin: pinDefinido, 
-                    metodo: metodo 
+                    Nombre_usuario: nombre,    // Coincide coa túa imaxe
+                    método_acceso: metodo,     // Coincide coa túa imaxe
+                    foto_base64: pinDefinido    // Usamos esta columna para gardar o PIN
                 }
             ]);
 
-        if (error) {
-            console.error("Erro de Supabase:", error.message);
-            alert("No se pudo guardar en la base de datos: " + error.message);
-            return;
-        }
+        if (error) throw error;
 
-        // --- GARDAR EN LOCAL (para que a tablet responda rápido) ---
+        // Gardamos tamén local para que a tablet saiba que xa hai alguén
         localStorage.setItem('hospede_rexistrado', 'true');
         localStorage.setItem('metodo_acceso', metodo);
         localStorage.setItem('pin_guardado', pinDefinido);
         localStorage.setItem('nome_cliente', nombre);
 
-        alert("¡Cuenta creada y guardada en la base de datos!");
-        
-        // Rediriximos ao panel de control
+        alert("¡Acceso configurado correctamente!");
         window.location.href = "acceso-llaves.html";
 
-    } catch (err) {
-        console.error("Erro crítico:", err);
-        alert("Ocorreu un erro inesperado.");
+    } catch (error) {
+        console.error("Erro en Supabase:", error.message);
+        alert("Erro ao conectar coa base de datos. Revisa se o RLS está desactivado na táboa 'accesos_llaves'");
     }
 }
