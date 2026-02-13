@@ -3,32 +3,32 @@
  */
 
 window.onload = function() {
-    // 1. SEGURIDADE: Verificamos se a tablet está desbloqueada polo propietario
     if (sessionStorage.getItem('tablet_desbloqueada') !== 'true') {
         window.location.href = "index.html";
         return;
     }
     
-    // 2. DETECTAR ESTADO DO CLIENTE
     const metodo = localStorage.getItem('metodo_acceso');
     const contenedor = document.getElementById('interfaz-dinamica');
+    const btnCrear = document.querySelector('.crear-cuenta'); // Seleccionamos o botón
 
     if (metodo) {
-        // SE XA TEN CONTA: Amosamos o botón de abrir directamente
+        // 1. Ocultamos o botón de crear conta
+        if (btnCrear) btnCrear.style.display = 'none';
+
+        // 2. Amosamos o botón de abrir
         contenedor.innerHTML = `
             <div class="panel-usuario">
-                <p>Estado: <strong>Cuenta Activa (${metodo.toUpperCase()})</strong></p>
-                <button type="button" class="btn-principal" onclick="solicitarAcceso()" style="padding: 20px; font-size: 1.5rem; background: #2ecc71; color: white; border-radius: 10px; border: none; cursor: pointer;">
+                <p>Bienvenido. Tu acceso por <strong>${metodo.toUpperCase()}</strong> está listo.</p>
+                <button type="button" class="btn-principal" onclick="solicitarAcceso()">
                     🔑 ABRIR CAJÓN
                 </button>
             </div>
         `;
     } else {
-        // SE NON TEN CONTA: Mensaxe de benvida para que a cree
         contenedor.innerHTML = `
             <div class="benvida">
-                <p>Bienvenido al sistema de gestión de llaves.</p>
-                <p>Por favor, pulsa en <strong>"Crear cuenta"</strong> para configurar tu acceso.</p>
+                <p>Bienvenido. Por favor, pulsa en "Crear cuenta" para empezar.</p>
             </div>
         `;
     }
