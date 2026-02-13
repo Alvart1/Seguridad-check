@@ -25,7 +25,7 @@ function elixirMetodo(metodo) {
 
     // 4. REDIRECCIÓN:
     // Imos á pantalla final onde se controlará o caixón.
-    window.location.href = "chaves.html";
+    window.location.href = "acceso-llaves.html";
 }
 
 // --- CONTROL DE INACTIVIDADE ---

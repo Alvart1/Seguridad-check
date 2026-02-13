@@ -61,7 +61,7 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
         } else {
             // CAMBIO CLAVE: Ao rematar, gardamos e imos á Interface 3 (Crear Conta)
             localStorage.setItem('hospede_rexistrado', 'true');
-            window.location.href = "crear-conta.html";
+            window.location.href = "crear-cuenta.html";
         }
     } else {
         alert("Erro ao gardar: " + error.message);
