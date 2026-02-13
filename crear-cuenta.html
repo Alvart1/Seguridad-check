@@ -3,31 +3,39 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurar Acceso a las llaves</title>
+    <title>Configurar Acceso</title>
     <link rel="stylesheet" href="css/crear-cuenta.css">
 </head>
 <body>
-
     <div class="panel">
-        <div class="titulo">
-            <h1>Configura tu Acceso</h1>
+        <div id="paso-seleccion">
+            <h1>Crea tu cuenta de acceso</h1>
+            <p>¿Cómo prefieres abrir el cajón?</p>
+            <div class="grid-opciones">
+                <button onclick="mostrarFormulario('pin')" class="btn-metodo">🔢 PIN Numérico</button>
+                <button onclick="mostrarFormulario('foto')" class="btn-metodo">📸 Reconocimiento Facial</button>
+            </div>
         </div>
 
-        <p>Has completado el registro. Ahora, elige cómo prefieres abrir el cajón de las llaves durante tu estancia:</p>
-
-        <div class="opciones-acceso">
-            <button type="button" class="btn-metodo" onclick="elixirMetodo('pin')">
-                <span class="texto">Usuario y PIN</span>
-            </button>
-
-            <button type="button" class="btn-metodo" onclick="elixirMetodo('foto')">
-                <span class="texto">Reconocimiento Facial</span>
-            </button>
+        <div id="form-pin" style="display: none;">
+            <h2>Configurar PIN</h2>
+            <label>Nombre:</label> <input type="text" id="nombre-pin" placeholder="Tu nombre">
+            <label>Pin:</label><input type="password" id="pin-valor" placeholder="PIN de 4 cifras" maxlength="4">
+            <button onclick="guardarYVolver('pin')" class="btn-guardar">Guardar y Finalizar</button>
         </div>
 
-        <p class="nota">Este será tu único método de apertura hasta que finalices tu estancia.</p>
+        <div id="form-foto" style="display: none;">
+            <h2>Reconocimiento Facial</h2>
+            <div class="visor-camara">
+                <div class="placeholder-cam">📷 Esperando cámara...</div>
+            </div>
+            <button onclick="guardarYVolver('foto')" class="btn-guardar">Capturar y Guardar</button>
+        </div>
+        
+        <button onclick="window.location.href='acceso-llaves.html'" class="btn-cancelar">Volver atrás</button>
     </div>
 
-    <script src="js/crear-cuenta.js"></script>
+    <script src="js/crear-cuenta.js">
+    </script>
 </body>
 </html>
