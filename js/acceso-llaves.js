@@ -3,11 +3,25 @@
  */
 
 window.onload = function() {
-    // 1. SEGURIDADE: Se non hai rexistro nin método elixido, fóra.
-    if (localStorage.getItem('hospede_rexistrado') !== 'true' || !localStorage.getItem('metodo_acceso')) {
+    // 1. SEGURIDADE MELLORADA
+    const desbloqueada = sessionStorage.getItem('tablet_desbloqueada') === 'true';
+    const rexistrado = localStorage.getItem('hospede_rexistrado') === 'true';
+    const tenMetodo = localStorage.getItem('metodo_acceso');
+
+    // Se a tablet non está desbloqueada polo propietario, fóra sempre
+    if (!desbloqueada) {
         window.location.href = "index.html";
         return;
     }
+
+    // Se está desbloqueada pero non rexistrou nin elixiu método, 
+    // significa que intentou entrar na URL a man sen facer o proceso
+    if (!rexistrado && !tenMetodo) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    // 2. CARGAR INTERFACE DINÁMICA... (o resto do teu código igual)
 
     // 2. CARGAR INTERFACE DINÁMICA
     const metodo = localStorage.getItem('metodo_acceso');
