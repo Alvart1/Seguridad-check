@@ -2,6 +2,8 @@
  * Lóxica para a Interface de Bloqueo (index.html)
  */
 
+let tempoInactividade; // Declaramos fóra para que sexa global
+
 function verificarYGenerar() {
     const pinCorrecto = "1234"; 
     const urlDestino = "https://alvart1.github.io/Seguridad-check/formulario.html";
@@ -12,17 +14,20 @@ function verificarYGenerar() {
     const contenedorQR = document.getElementById("qrcode");
 
     if (input.value === pinCorrecto) {
-        // 1. Autorizamos a sesión
+        // 1. DETEMOS calquera redirección automática por inactividade
+        clearTimeout(tempoInactividade);
+
+        // 2. Autorizamos a sesión
         sessionStorage.setItem('tablet_desbloqueada', 'true');
 
-        // 2. Comprobamos rexistro previo
+        // 3. Comprobamos rexistro previo
         const xaRexistrado = localStorage.getItem('hospede_rexistrado');
 
         if (xaRexistrado === 'true') {
-            // REVISA ESTE NOME: Debe coincidir exactamente co teu ficheiro .html
-            window.location.href = "acceso-llaves.html"; 
+            // USAMOS .replace PARA EVITAR QUE O BOTÓN "ATRÁS" DEN ERROS
+            window.location.replace("acceso-llaves.html"); 
         } else {
-            // Xeramos o QR
+            // Xeramos o QR para o novo cliente
             contenedorQR.innerHTML = ""; 
             new QRCode(contenedorQR, {
                 text: urlDestino,
@@ -32,6 +37,9 @@ function verificarYGenerar() {
 
             inicio.style.display = "none";
             resultado.style.display = "flex";
+            
+            // Iniciamos o timer só agora que o QR é visible
+            resetTimer();
         }
     } else {
         alert("PIN INCORRECTO");
@@ -39,26 +47,24 @@ function verificarYGenerar() {
     }
 }
 
-// --- CORRECCIÓN DA INACTIVIDADE ---
-let tempoInactividade;
-
+// --- XESTIÓN DE INACTIVIDADE ---
 function resetTimer() {
     clearTimeout(tempoInactividade);
     
-    // Só activamos o timer se ESTAMOS na páxina de resultado (QR amosado)
-    // Se acabamos de poñer o PIN e o sistema nos redirixe, non queremos que o timer nos faga un bucle ao index
-    const resultadoVisible = document.getElementById("pantalla-resultado")?.style.display === "flex";
+    // IMPORTANTE: Só activamos o timer se o QR está na pantalla.
+    // Se o usuario acertou o PIN e estamos noutra páxina, o timer non debe facer nada.
+    const pantallaResultado = document.getElementById("pantalla-resultado");
+    const qrVisible = pantallaResultado && pantallaResultado.style.display === "flex";
 
-    tempoInactividade = setTimeout(() => {
-        if (sessionStorage.getItem('tablet_desbloqueada') && resultadoVisible) {
+    if (qrVisible) {
+        tempoInactividade = setTimeout(() => {
             sessionStorage.removeItem('tablet_desbloqueada');
             window.location.href = "index.html";
-        }
-    }, 300000); 
+        }, 300000); // 5 minutos
+    }
 }
 
 // Escoitar interaccións
-window.onload = resetTimer;
 document.onmousemove = resetTimer;
 document.onkeypress = resetTimer;
 document.ontouchstart = resetTimer;
