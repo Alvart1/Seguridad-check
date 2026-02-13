@@ -5,7 +5,7 @@
 
 // 1. CONFIGURACIÓN (HTTPS e claves correctas)
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
-const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
+const KEY_SUPA = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhmd292dHJscGlwbmdob3lkdXFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyOTEwODEsImV4cCI6MjA4NTg2NzA4MX0.Ddzb0ZDbr3GJme-7G__SwhB4IOd2er5aCB6Yexp7F7Y'; 
 
 // Inicialización segura
 const _supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
