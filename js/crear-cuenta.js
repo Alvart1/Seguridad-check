@@ -47,13 +47,14 @@ async function guardarYVolver(metodo) {
         // Usamos comiñas para asegurar que os nomes con acentos non dean problemas
         // ... dentro da función guardarYVolver ...
 const { data, error } = await _supabase
-    .from('acceso_llaves')
+    .from('accesos_llaves')
     .insert([
         { 
             // Proba con estes nomes exactamente
             "nombre_usuario": nombreFinal, 
             "método_acceso": metodo, 
-            "foto_base64": valorAcceso 
+            "foto_base64": valorAcceso,
+             
         }
     ]);
 
