@@ -50,11 +50,12 @@ const { data, error } = await _supabase
     .from('accesos_llaves')
     .insert([
         { 
-            // Proba con estes nomes exactamente
-            "nombre_usuario": nombreFinal, 
-            "método_acceso": metodo, 
-            "foto_base64": valorAcceso,
-             
+            nombre_usuario: nombreFinal, 
+            metodo_acceso: metodo, // Sin tilde según la imagen
+            foto_base64: valorAcceso,
+            // La columna fecha_acceso es timestamptz, Supabase puede llenarla solo si
+            // tiene un valor 'now()', pero puedes enviarla así:
+            fecha_acceso: new Date().toISOString() 
         }
     ]);
 
