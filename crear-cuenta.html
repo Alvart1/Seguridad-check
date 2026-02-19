@@ -28,12 +28,16 @@
         </div>
 
         <div id="form-foto" style="display: none;">
-            <h2>Reconocimiento Facial</h2>
-            <div class="visor-camara">
-                <div class="placeholder-cam"> Esperando cámara...</div>
-            </div>
-            <button onclick="guardarYVolver('foto')" class="btn-guardar">Capturar y Guardar</button>
-        </div>
+    <h2>Reconocimiento Facial</h2>
+    <div class="visor-camara">
+        <video id="video-camara" autoplay playsinline style="width: 100%; border-radius: 10px; background: #000;"></video>
+        <canvas id="canvas-foto" style="display: none;"></canvas>
+    </div>
+    <br>
+    <label>Nombre:</label> 
+    <input type="text" id="nombre-foto" placeholder="Tu nombre">
+    <button onclick="guardarYVolver('foto')" class="btn-guardar">Capturar y Guardar</button>
+</div>
         
         <button onclick="window.location.href='acceso-llaves.html'" class="btn-cancelar">Volver atrás</button>
     </div>
