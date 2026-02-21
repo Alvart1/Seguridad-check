@@ -58,11 +58,30 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
             document.getElementById('formulario').reset();
             limparFirma();
             document.getElementById('titulo-formulario').innerText = `Datos del Viajero ${hospedeActual}`;
-        } else {
-            // CAMBIO CLAVE: Ao rematar, gardamos e imos á Interface 3 (Crear Conta)
-            localStorage.setItem('hospede_rexistrado', 'true');
-            window.location.href = "crear-cuenta.html";
-        }
+       } else {
+
+    try {
+        // 1️⃣ Crear evento oficial de check-in
+        const { error: errorEvento } = await _supabase
+            .from('eventos_sistema')
+            .insert([{
+                reserva_id: reservaId,
+                tipo_evento: 'checkin_completado',
+                fecha_evento: new Date().toISOString(),
+                notificado: false
+            }]);
+
+        if (errorEvento) throw errorEvento;
+
+        // 2️⃣ Continuar flujo normal
+        localStorage.setItem('hospede_rexistrado', 'true');
+        window.location.href = "crear-cuenta.html";
+
+    } catch (err) {
+        alert("Error al registrar el evento del sistema: " + err.message);
+    }
+}
+
     } else {
         alert("Erro ao gardar: " + error.message);
     }
