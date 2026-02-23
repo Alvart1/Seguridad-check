@@ -2,6 +2,9 @@
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
 const _supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
+const Public_KEY_Emailjs = '-7vKXPKDrKzQiVSrn';
+const Service_ID_emailjs = 'service_cog5jua';
+const Templace_ID_emailjs = 'template_5m1y4si';
 
 let totalHospedes = 0, hospedeActual = 1, reservaId = null;
 
@@ -70,8 +73,18 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
                 fecha_evento: new Date().toISOString(),
                 notificado: false
             }]);
-
-        if (errorEvento) throw errorEvento;
+if (errorEvento) throw errorEvento;
+// 📧 Enviar email automático al propietario
+emailjs.send(Service_ID_emailjs, Templace_ID_emailjs, {
+    reserva_id: reservaId,
+    fecha_evento: new Date().toLocaleString()
+})
+.then(() => {
+    console.log("Email enviado correctamente");
+})
+.catch((error) => {
+    console.error("Error enviando email:", error);
+});
 
         // 2️⃣ Continuar flujo normal
         localStorage.setItem('hospede_rexistrado', 'true');
@@ -118,3 +131,9 @@ document.onmousedown = () => {
     clearTimeout(tempoInactividade);
     tempoInactividade = setTimeout(() => window.location.href = "index.html", 300000);
 };
+
+//Mensaje automatico al correo
+
+  (function(){
+    emailjs.init(Public_KEY_Emailjs);
+  })();
