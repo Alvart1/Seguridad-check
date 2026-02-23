@@ -1,6 +1,7 @@
 /**
  * Lóxica para o Panel de Control (acceso-llaves.html)
  */
+const IP_Raspberry = "http://10.182.60.63:8080/abrir";
 
 window.onload = function() {
     if (sessionStorage.getItem('tablet_desbloqueada') !== 'true') {
@@ -57,7 +58,7 @@ function solicitarAcceso() {
 
 async function abrirCajonReal() {
     try {
-        const res = await fetch(`http://10.158.13.63:8080/abrir`);
+        const res = await fetch(IP_Raspberry);
         if (res.ok) {
             alert("✅ ¡Cajón abierto! Recoge tus llaves.");
         } else {
