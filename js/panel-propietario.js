@@ -1,5 +1,5 @@
-const URL_SUPA = 'TU_URL';
-const KEY_SUPA = 'TU_PUBLIC_KEY';
+const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
+const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu';
 const supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
 
 async function cargarReservas() {
