@@ -1,0 +1,35 @@
+* { padding: 0; margin: 0; box-sizing: border-box; }
+body {
+    background-color: rgb(0, 35, 80);
+    color: white;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+input, select {
+    height: 3.5rem;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    padding: 0 10px;
+}
+button {
+    width: 90%;
+    padding: 1.5rem;
+    margin: 10px auto;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 20px;
+    border: none;
+    background-color: rgb(223, 195, 159);
+    cursor: pointer;
+    text-transform: uppercase;
+}
+button:active { 
+    transform: scale(0.98); 
+    background-color: #ccc; 
+}

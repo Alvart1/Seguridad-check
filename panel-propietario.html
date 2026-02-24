@@ -7,9 +7,39 @@
 </head>
 <body>
 
-<h1>Panel de Control</h1>
+<div class="sidebar">
+  <h2>CONTROL</h2>
+  <button onclick="mostrarSeccion('camaras')"> Cámaras</button>
+  <button onclick="mostrarSeccion('reservas')"> Reservas</button>
+  <button onclick="mostrarSeccion('control')"> Abrir Cajón</button>
+  <button onclick="mostrarSeccion('llaves')"> Acceso Llaves</button>
+</div>
 
-<div id="lista-reservas"></div>
+<div class="contenido">
+
+  <div id="camaras" class="seccion">
+      <h2>Cámaras</h2>
+      <iframe src="http://10.182.60.63/zm" width="100%" height="600"></iframe>
+  </div>
+
+  <div id="reservas" class="seccion">
+      <h2>Reservas</h2>
+      <div id="lista-reservas"></div>
+  </div>
+
+  <div id="control" class="seccion">
+      <h2>Abrir Cajón</h2>
+      <button onclick="abrirCajon()" class="boton-rojo">
+          ABRIR CAJÓN
+      </button>
+  </div>
+
+  <div id="llaves" class="seccion">
+      <h2>Acceso Llaves</h2>
+      <iframe src="acceso-llaves.html" width="100%" height="600"></iframe>
+  </div>
+
+</div>
 
 </body>
 </html>

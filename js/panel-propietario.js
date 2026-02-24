@@ -1,6 +1,17 @@
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
-const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu';
+const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
 const supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
+
+function mostrarSeccion(id) {
+    document.querySelectorAll('.seccion')
+        .forEach(sec => sec.style.display = 'none');
+
+    document.getElementById(id).style.display = 'block';
+
+    if (id === 'reservas') {
+        cargarReservas();
+    }
+}
 
 async function cargarReservas() {
 
@@ -9,17 +20,7 @@ async function cargarReservas() {
         .select(`
             id,
             fecha_entrada,
-            hospedes (
-                nombre,
-                apellidos,
-                codigo_documento,
-                firma_base64
-            ),
-            eventos_sistema (
-                tipo_evento,
-                fecha_evento,
-                notificado
-            )
+            hospedes(nombre, apellidos, codigo_documento)
         `);
 
     if (error) {
@@ -27,33 +28,20 @@ async function cargarReservas() {
         return;
     }
 
-    mostrarReservas(data);
-}
-
-function mostrarReservas(reservas) {
-
     const contenedor = document.getElementById('lista-reservas');
     contenedor.innerHTML = '';
 
-    reservas.forEach(reserva => {
-
+    data.forEach(r => {
         const div = document.createElement('div');
-        div.style.border = "1px solid black";
+        div.style.border = "1px solid #ccc";
         div.style.margin = "10px";
         div.style.padding = "10px";
 
         div.innerHTML = `
-            <h3>Reserva ID: ${reserva.id}</h3>
-            <p>Fecha entrada: ${reserva.fecha_entrada}</p>
-            <p>Notificado: ${
-                reserva.eventos_sistema.length > 0 
-                ? reserva.eventos_sistema[0].notificado 
-                : 'No'
-            }</p>
-            <h4>Huéspedes:</h4>
-            ${reserva.hospedes.map(h =>
-                `<p>${h.nombre} ${h.apellidos} - ${h.codigo_documento}</p>
-                 <img src="${h.firma_base64}" width="200"/>`
+            <h3>Reserva ${r.id}</h3>
+            <p>Fecha: ${r.fecha_entrada}</p>
+            ${r.hospedes.map(h =>
+                `<p>${h.nombre} ${h.apellidos} - ${h.codigo_documento}</p>`
             ).join('')}
         `;
 
@@ -61,4 +49,12 @@ function mostrarReservas(reservas) {
     });
 }
 
-cargarReservas();
+async function abrirCajon() {
+
+    await fetch("http://IP_RASPBERRY:3000/abrir-cajon", {
+        method: "POST"
+    });
+
+    alert("Cajón abierto");
+}
+
