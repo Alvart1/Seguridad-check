@@ -39,30 +39,69 @@ window.onload = function() {
 
 // --- FUNCIÓNS DE ACCIÓN ---
 
-function solicitarAcceso() {
+async function solicitarAcceso() {
     const metodo = localStorage.getItem('metodo_acceso');
-    const pinCorrecto = localStorage.getItem('pin_guardado'); // En caso de foto, aquí está el Base64
     
     if (metodo === 'pin') {
-        let intento = prompt("Introduce tu PIN de 4 cifras para abrir:");
-        if (intento === pinCorrecto) {
+        let intento = prompt("Introduce tu PIN:");
+        if (intento === localStorage.getItem('pin_guardado')) {
             abrirCajonReal();
         } else {
             alert("❌ PIN Incorrecto");
         }
     } else if (metodo === 'foto') {
-        // En lugar de un alert vacío, podrías redirigir a una mini-página de escaneo
-        // O pedir una confirmación visual por ahora:
-        let confirmar = confirm("¿Deseas iniciar el reconocimiento facial ahora?");
-        if (confirmar) {
-            console.log("Comparando con imagen guardada..."); 
-            // Aquí se debería comparar el stream actual con localStorage.getItem('pin_guardado')
-            alert("✅ Rostro reconocido. Identidad: " + localStorage.getItem('nome_cliente'));
-            abrirCajonReal();
-        }
+        await verificarRostroReal();
     }
 }
 
+async function verificarRostroReal() {
+    // 1. Cargar modelos (esto solo se hace la primera vez)
+    await faceapi.nets.tinyFaceDetector.loadFromUri('https://raw.githubusercontent.com/vladmandic/face-api/master/model');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('https://raw.githubusercontent.com/vladmandic/face-api/master/model');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('https://raw.githubusercontent.com/vladmandic/face-api/master/model');
+
+    // 2. Obtener la foto guardada
+    const fotoGuardadaBase64 = localStorage.getItem('pin_guardado');
+    const imgGuardada = await faceapi.fetchImage(fotoGuardadaBase64);
+    
+    // 3. Obtener el descriptor del rostro guardado
+    const descriptorGuardado = await faceapi.detectSingleFace(imgGuardada, new faceapi.TinyFaceDetectorOptions())
+                                          .withFaceLandmarks()
+                                          .withFaceDescriptor();
+
+    if (!descriptorGuardado) {
+        alert("No se pudo analizar la foto original. Intenta crear la cuenta de nuevo.");
+        return;
+    }
+
+    // 4. Iniciar cámara para comparar
+    const video = document.getElementById('video-verificar');
+    document.getElementById('contenedor-verificacion').style.display = 'block';
+    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+    video.srcObject = stream;
+
+    // 5. Esperar un momento y capturar rostro actual
+    setTimeout(async () => {
+        const deteccionActual = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                                             .withFaceLandmarks()
+                                             .withFaceDescriptor();
+
+        if (deteccionActual) {
+            // 6. Comparar distancias (0.6 es el umbral estándar, menos es más estricto)
+            const distancia = faceapi.euclideanDistance(descriptorGuardado.descriptor, deteccionActual.descriptor);
+            
+            if (distancia < 0.5) { // ¡Coincidencia!
+                alert("✅ Rostro reconocido con éxito.");
+                stream.getTracks().forEach(t => t.stop()); // Apagar cámara
+                abrirCajonReal();
+            } else {
+                alert("❌ El rostro no coincide.");
+            }
+        } else {
+            alert("No se detecta ningún rostro frente a la cámara.");
+        }
+    }, 2000); // Damos 2 segundos para que el usuario se coloque
+}
 async function abrirCajonReal() {
     try {
         const res = await fetch(IP_Raspberry);
