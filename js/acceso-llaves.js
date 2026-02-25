@@ -75,10 +75,51 @@ function crearcuenta() {
     window.location.href = "crear-cuenta.html";
 }
 
-function confirmarFinEstancia() {
-    if (confirm("¿Seguro que quieres finalizar? Se borrarán todos tus datos y la tablet se bloqueará.")) {
+async function confirmarFinEstancia() {
+
+    if (!confirm("¿Seguro que quieres finalizar? Se borrarán todos tus datos y la tablet se bloqueará.")) {
+        return;
+    }
+
+    try {
+
+        // Buscar última reserva
+        const { data, error } = await supabaseClient
+            .from('reservas')
+            .select('*')
+            .order('id', { ascending: false })
+            .limit(1);
+
+        if (error || !data || data.length === 0) {
+            alert("No se encontró reserva activa.");
+            return;
+        }
+
+        const ultimaReserva = data[0];
+
+        // Actualizar estado
+        const { error: updateError } = await supabaseClient
+            .from('reservas')
+            .update({
+                estado_estancia: 'finalizada'
+            })
+            .eq('id', ultimaReserva.id);
+
+        if (updateError) {
+            alert("Error al finalizar estancia.");
+            console.error(updateError);
+            return;
+        }
+
+        alert("✅ Estancia finalizada correctamente");
+
+        // Limpiar datos y bloquear tablet
         localStorage.clear();
         sessionStorage.clear();
         window.location.href = "index.html";
+
+    } catch (err) {
+        console.error(err);
+        alert("Error inesperado");
     }
 }
