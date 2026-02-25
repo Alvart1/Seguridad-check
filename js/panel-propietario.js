@@ -6,7 +6,7 @@ function irReservas() {
     window.location.href = "https://supabase.com/dashboard/project/xfwovtrlpipnghoyduql/editor/17513?schema=public";
 }
 
-const IP_Raspberry = "http://10.182.60.63:8080/abrir";
+const IP_Raspberry = "http://10.182.60.63:3000/abrir";
 async function abrirCajon() {
     try {
         const res = await fetch(IP_Raspberry);

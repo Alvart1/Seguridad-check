@@ -1,7 +1,7 @@
 /**
  * Lóxica para o Panel de Control (acceso-llaves.html)
  */
-const IP_Raspberry = "http://10.182.60.63:8080/abrir";
+const IP_Raspberry = "http://10.182.60.63:3000/abrir";
 
 window.onload = function() {
     if (sessionStorage.getItem('tablet_desbloqueada') !== 'true') {
