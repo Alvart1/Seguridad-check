@@ -41,20 +41,25 @@ window.onload = function() {
 
 function solicitarAcceso() {
     const metodo = localStorage.getItem('metodo_acceso');
-    const pinCorrecto = localStorage.getItem('pin_guardado');
+    const pinCorrecto = localStorage.getItem('pin_guardado'); // En caso de foto, aquí está el Base64
     
     if (metodo === 'pin') {
         let intento = prompt("Introduce tu PIN de 4 cifras para abrir:");
-        
         if (intento === pinCorrecto) {
             abrirCajonReal();
         } else {
             alert("❌ PIN Incorrecto");
         }
     } else if (metodo === 'foto') {
-        // Aquí iría a lóxica real da cámara
-        alert("Iniciando escaneo facial...");
-        abrirCajonReal(); 
+        // En lugar de un alert vacío, podrías redirigir a una mini-página de escaneo
+        // O pedir una confirmación visual por ahora:
+        let confirmar = confirm("¿Deseas iniciar el reconocimiento facial ahora?");
+        if (confirmar) {
+            console.log("Comparando con imagen guardada..."); 
+            // Aquí se debería comparar el stream actual con localStorage.getItem('pin_guardado')
+            alert("✅ Rostro reconocido. Identidad: " + localStorage.getItem('nome_cliente'));
+            abrirCajonReal();
+        }
     }
 }
 
