@@ -70,62 +70,76 @@ async function finalizarEstancia() {
 }
 
 async function irReservas() {
-    // 1. Mostrar la sección y limpiar lo anterior
-    const seccion = document.getElementById('seccion-reservas');
-    const tabla = document.getElementById('tabla-reservas');
+    let seccion = document.getElementById('seccion-reservas');
+    if (!seccion) {
+        seccion = document.createElement('div');
+        seccion.id = 'seccion-reservas';
+        seccion.style.marginLeft = "240px";
+        seccion.style.padding = "20px";
+        document.body.appendChild(seccion);
+    }
+    
     seccion.style.display = 'block';
-    tabla.innerHTML = '<p>Consultando base de datos...</p>';
+    seccion.innerHTML = '<h2>Listado Completo de Huéspedes</h2><div id="tabla-datos">Cargando...</div>';
 
     try {
-        // 2. Pedir a Supabase todas las reservas
         const { data, error } = await supabaseClient
             .from('reservas')
-            .select('*')
+            .select(`
+                id,
+                created_at,
+                estado_estancia,
+                hospedes (
+                    nombre,
+                    apellidos,
+                    genero,
+                    codigo_documento,
+                    direccion,
+                    email
+                )
+            `)
             .order('id', { ascending: false });
 
         if (error) throw error;
 
-        if (!data || data.length === 0) {
-            tabla.innerHTML = '<p>No hay reservas registradas.</p>';
-            return;
-        }
-
-        // 3. Crear el HTML de la tabla
         let html = `
-            <table border="1" style="width:100%; border-collapse: collapse; text-align: left;">
-                <thead style="background-color: #2c3e50; color: white;">
-                    <tr>
-                        <th style="padding: 10px;">ID</th>
-                        <th style="padding: 10px;">Titular</th>
-                        <th style="padding: 10px;">Email</th>
-                        <th style="padding: 10px;">Estado</th>
-                        <th style="padding: 10px;">Fecha</th>
+            <table style="width:100%; border-collapse: collapse; background: white; font-size: 14px;">
+                <thead>
+                    <tr style="background-color: #2c3e50; color: white; text-align: left;">
+                        <th style="padding:10px;">Nombre</th>
+                        <th style="padding:10px;">DNI</th>
+                        <th style="padding:10px;">Género</th>
+                        <th style="padding:10px;">Dirección</th>
+                        <th style="padding:10px;">Email</th>
+                        <th style="padding:10px;">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
 
         data.forEach(reserva => {
-            html += `
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">${reserva.id}</td>
-                    <td style="padding: 10px;">${reserva.nome_titular || 'N/A'}</td>
-                    <td style="padding: 10px;">${reserva.email_titular || 'N/A'}</td>
-                    <td style="padding: 10px;">
-                        <span style="padding: 5px; border-radius: 5px; background: ${reserva.estado_estancia === 'finalizada' ? '#e74c3c' : '#2ecc71'}; color: white;">
-                            ${reserva.estado_estancia}
-                        </span>
-                    </td>
-                    <td style="padding: 10px;">${new Date(reserva.created_at).toLocaleString()}</td>
-                </tr>
-            `;
+            (reserva.hospedes || []).forEach(h => {
+                html += `
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding:10px;">${h.nombre} ${h.apellidos}</td>
+                        <td style="padding:10px;">${h.codigo_documento}</td>
+                        <td style="padding:10px;">${h.genero || '---'}</td>
+                        <td style="padding:10px;">${h.direccion || '---'}</td>
+                        <td style="padding:10px;">${h.email}</td>
+                        <td style="padding:10px;">
+                            <span style="color: ${reserva.estado_estancia === 'finalizada' ? 'red' : 'green'}; font-weight: bold;">
+                                ${reserva.estado_estancia || 'activa'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
         });
 
         html += '</tbody></table>';
-        tabla.innerHTML = html;
+        document.getElementById('tabla-datos').innerHTML = html;
 
     } catch (err) {
-        console.error(err);
-        tabla.innerHTML = '<p style="color:red;">Error al cargar reservas. Revisa la consola.</p>';
+        document.getElementById('tabla-datos').innerHTML = '<p>Error: ' + err.message + '</p>';
     }
 }

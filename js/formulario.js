@@ -45,12 +45,14 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
     
     const canvas = document.getElementById('canvas-firma');
     const datos = { 
-        reserva_id: reservaId, 
+        reserva_id: reservaId,
         nombre: document.getElementById('nombre').value,
         apellidos: document.getElementById('apellidos').value,
+        genero: document.getElementById('genero').value, 
         codigo_documento: document.getElementById('documento').value,
-        email: document.getElementById('correo').value,
-        firma_base64: canvas.toDataURL() 
+        direccion: document.getElementById('direccion').value,  
+        fecha_nacimiento: document.getElementById('fecha_nac').value,
+        email: document.getElementById('correo').value
     };
 
     const { error } = await _supabase.from('hospedes').insert([datos]);
