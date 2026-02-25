@@ -1,7 +1,21 @@
 /**
  * Lóxica para a Interface de Bloqueo (index.html)
  */
-
+let clicsSecretos = 0;
+document.querySelector(".titulo h1").onclick = function() {
+    clicsSecretos++;
+    if (clicsSecretos === 5) {
+        const pass = prompt("Acceso Restringido. Introduce la clave maestra:");
+        if (pass === "abc123.") { // Cambia esta clave a tu gusto
+            window.location.href = "panel-propietario.html";
+        } else {
+            alert("Acceso denegado");
+            clicsSecretos = 0;
+        }
+    }
+    // Reiniciar contador si no completa los 5 clics en 3 segundos
+    setTimeout(() => { clicsSecretos = 0; }, 3000);
+};
 let tempoInactividade; // Declaramos fóra para que sexa global
 
 function verificarYGenerar() {

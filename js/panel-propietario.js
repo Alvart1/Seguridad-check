@@ -80,7 +80,7 @@ async function irReservas() {
     }
     
     seccion.style.display = 'block';
-    seccion.innerHTML = '<h2>Listado Completo de Huéspedes</h2><div id="tabla-datos">Cargando...</div>';
+    seccion.innerHTML = '<h2>Listado Detallado de Huéspedes</h2><div id="tabla-datos">Cargando...</div>';
 
     try {
         const { data, error } = await supabaseClient
@@ -95,6 +95,7 @@ async function irReservas() {
                     genero,
                     codigo_documento,
                     direccion,
+                    fecha_nacimiento,
                     email
                 )
             `)
@@ -103,12 +104,14 @@ async function irReservas() {
         if (error) throw error;
 
         let html = `
-            <table style="width:100%; border-collapse: collapse; background: white; font-size: 14px;">
+            <table style="width:100%; border-collapse: collapse; background: white; font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                 <thead>
                     <tr style="background-color: #2c3e50; color: white; text-align: left;">
-                        <th style="padding:10px;">Nombre</th>
-                        <th style="padding:10px;">DNI</th>
+                        <th style="padding:10px;">Fecha Registro</th>
+                        <th style="padding:10px;">Nombre y Apellidos</th>
+                        <th style="padding:10px;">DNI / Pasaporte</th>
                         <th style="padding:10px;">Género</th>
+                        <th style="padding:10px;">F. Nacimiento</th>
                         <th style="padding:10px;">Dirección</th>
                         <th style="padding:10px;">Email</th>
                         <th style="padding:10px;">Estado</th>
@@ -118,18 +121,25 @@ async function irReservas() {
         `;
 
         data.forEach(reserva => {
-            (reserva.hospedes || []).forEach(h => {
+            const fechaRegistro = new Date(reserva.created_at).toLocaleString('es-ES', {
+                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            (reserva.hospedes || []).forEach((h, index) => {
                 html += `
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding:10px;">${h.nombre} ${h.apellidos}</td>
-                        <td style="padding:10px;">${h.codigo_documento}</td>
-                        <td style="padding:10px;">${h.genero || '---'}</td>
-                        <td style="padding:10px;">${h.direccion || '---'}</td>
-                        <td style="padding:10px;">${h.email}</td>
-                        <td style="padding:10px;">
-                            <span style="color: ${reserva.estado_estancia === 'finalizada' ? 'red' : 'green'}; font-weight: bold;">
+                    <tr style="border-bottom: 1px solid #000000;">
+                        <td style="padding:10px; color: #666; ">${index === 0 ? fechaRegistro : ''}</td>
+                        <td style="padding:10px; font-weight: bold; color:black;">${h.nombre} ${h.apellidos}</td>
+                        <td style="padding:10px; color:black;">${h.codigo_documento}</td>
+                        <td style="padding:10px; color:black;">${h.genero || '---'}</td>
+                        <td style="padding:10px; color:black;">${h.fecha_nacimiento || '---'}</td>
+                        <td style="padding:10px; color:black;">${h.direccion || '---'}</td>
+                        <td style="padding:10px; color:black;">${h.email}</td>
+                        <td style="padding:10px; color:black;">
+                            ${index === 0 ? `
+                            <span style="padding: 3px 7px; border-radius: 4px; color: white; font-size: 11px; background: ${reserva.estado_estancia === 'finalizada' ? '#e74c3c' : '#2ecc71'};">
                                 ${reserva.estado_estancia || 'activa'}
-                            </span>
+                            </span>` : ''}
                         </td>
                     </tr>
                 `;
@@ -140,6 +150,30 @@ async function irReservas() {
         document.getElementById('tabla-datos').innerHTML = html;
 
     } catch (err) {
-        document.getElementById('tabla-datos').innerHTML = '<p>Error: ' + err.message + '</p>';
+        document.getElementById('tabla-datos').innerHTML = '<p style="color:red;">Error: ' + err.message + '</p>';
     }
+}
+
+const CLAVE_ADMIN = "propietario123"; // La clave que tú quieras
+
+function irCamaras() {
+    const pass = prompt("Introduce la clave de seguridad para ver las cámaras:");
+    if (pass === CLAVE_ADMIN) {
+        window.location.href = "http://10.182.60.63/zm/index.php";
+    } else {
+        alert("Clave incorrecta");
+    }
+}
+
+// Modifica el inicio de tu función irReservas para que incluya esto:
+async function irReservas() {
+    const pass = prompt("Introduce la clave de seguridad para ver la base de datos:");
+    if (pass !== CLAVE_ADMIN) {
+        alert("Clave incorrecta");
+        return;
+    }
+    
+    // ... aquí sigue todo el código que ya teníamos de la tabla ...
+    let seccion = document.getElementById('seccion-reservas');
+    // (Resto del código igual)
 }
