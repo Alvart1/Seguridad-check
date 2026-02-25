@@ -23,36 +23,49 @@ const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
 const supabaseClient = supabase.createClient(URL_SUPA, KEY_SUPA);
 
-
 async function finalizarEstancia() {
 
     try {
 
-        // Buscar reserva activa
-        const { data, error } = await supabase
+        // 1️⃣ Buscar la última reserva creada
+        const { data, error } = await supabaseClient
             .from('reservas')
             .select('*')
-            .eq('estado', 'activa')
-            .single();
+            .order('id', { ascending: false })
+            .limit(1);
 
-        if (error || !data) {
-            alert("No hay estancia activa");
+        if (error) {
+            alert("Error al buscar reserva");
+            console.error(error);
             return;
         }
 
-        // Actualizar estado
-        await supabase
+        if (!data || data.length === 0) {
+            alert("No hay reservas registradas");
+            return;
+        }
+
+        const ultimaReserva = data[0];
+
+        // 2️⃣ Actualizar solo estado_estancia
+        const { error: updateError } = await supabaseClient
             .from('reservas')
             .update({
-                estado: 'finalizada',
-                fecha_salida: new Date().toISOString()
+                estado_estancia: 'finalizada'
             })
-            .eq('id', data.id);
+            .eq('id', ultimaReserva.id);
 
-        alert("Estancia finalizada correctamente");
+        if (updateError) {
+            alert("Error al actualizar reserva");
+            console.error(updateError);
+            return;
+        }
+
+        alert("✅ Estancia finalizada correctamente");
 
     } catch (err) {
         console.error(err);
-        alert("Error al finalizar estancia");
+        alert("Error inesperado al finalizar estancia");
     }
 }
+
