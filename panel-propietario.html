@@ -13,14 +13,21 @@
   <h2>CONTROL</h2>
 <button onclick="irCamaras()"> Cámaras</button>
 
-<button onclick="irReservas()"> Reservas</button>
+<button onclick="irBaseDatos()"> Reservas</button>
 
 <button onclick="abrirCajon()"> Abrir Cajón</button>
 
 <button onclick="finalizarEstancia()"> Finalizar Estancia</button>
 
 </div>
-
+<div class="contenido-principal" style="margin-left: 220px; padding: 20px;">
+    <div id="seccion-reservas" style="display: none;">
+        <h2>Listado de Reservas</h2>
+        <div id="tabla-reservas">
+            <p>Cargando datos...</p>
+        </div>
+    </div>
+</div>
 <script src="js/panel-propietario.js"></script>
 </body>
 </html>
