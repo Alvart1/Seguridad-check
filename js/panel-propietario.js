@@ -1,75 +1,39 @@
-function irCamaras() {
-    window.location.href = "http://10.182.60.63/zm/index.php";
-}
-
-function irBaseDatos() {
-    window.location.href = "https://supabase.com/dashboard/project/xfwovtrlpipnghoyduql/editor/17513?schema=public";
-}
-
+// 1. CONFIGURACIÓN Y CLIENTE
+const CLAVE_ADMIN = "abc123."; 
 const IP_Raspberry = "http://10.182.60.63:3000/abrir";
-async function abrirCajon() {
-    try {
-        const res = await fetch(IP_Raspberry);
-        if (res.ok) {
-            alert("✅ ¡Cajón abierto! Recoge tus llaves.");
-        } else {
-            alert("⚠️ El cajón no responde. Comprueba la conexión del hardware.");
-        }
-    } catch (e) {
-        alert("❌ ERROR: No se pudo conectar con el servidor del cajón.");
-    }
-}
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
 const supabaseClient = supabase.createClient(URL_SUPA, KEY_SUPA);
 
-async function finalizarEstancia() {
+// --- FUNCIONES DE ACCESO PROTEGIDO ---
 
-    try {
-
-        // 1️⃣ Buscar la última reserva creada
-        const { data, error } = await supabaseClient
-            .from('reservas')
-            .select('*')
-            .order('id', { ascending: false })
-            .limit(1);
-
-        if (error) {
-            alert("Error al buscar reserva");
-            console.error(error);
-            return;
-        }
-
-        if (!data || data.length === 0) {
-            alert("No hay reservas registradas");
-            return;
-        }
-
-        const ultimaReserva = data[0];
-
-        // 2️⃣ Actualizar solo estado_estancia
-        const { error: updateError } = await supabaseClient
-            .from('reservas')
-            .update({
-                estado_estancia: 'finalizada'
-            })
-            .eq('id', ultimaReserva.id);
-
-        if (updateError) {
-            alert("Error al actualizar reserva");
-            console.error(updateError);
-            return;
-        }
-
-        alert("✅ Estancia finalizada correctamente");
-
-    } catch (err) {
-        console.error(err);
-        alert("Error inesperado al finalizar estancia");
+function irCamaras() {
+    const pass = prompt("Introduce la clave de seguridad para ver las cámaras:");
+    if (pass === CLAVE_ADMIN) {
+        window.location.href = "http://10.182.60.63/zm/index.php";
+    } else {
+        alert("Clave incorrecta");
     }
 }
 
+function irBaseDatos() {
+    const pass = prompt("Introduce la clave de seguridad para acceder al panel de Supabase:");
+    if (pass === CLAVE_ADMIN) {
+        window.location.href = "https://supabase.com/dashboard/project/xfwovtrlpipnghoyduql/editor/17513?schema=public";
+    } else {
+        alert("Clave incorrecta");
+    }
+}
+
+// --- FUNCIÓN DE TABLA DE RESERVAS (DENTRO DEL PANEL) ---
+
 async function irReservas() {
+    const pass = prompt("Introduce la clave de seguridad para ver el listado de huéspedes:");
+    if (pass !== CLAVE_ADMIN) {
+        alert("Clave incorrecta");
+        return;
+    }
+
     let seccion = document.getElementById('seccion-reservas');
     if (!seccion) {
         seccion = document.createElement('div');
@@ -96,7 +60,8 @@ async function irReservas() {
                     codigo_documento,
                     direccion,
                     fecha_nacimiento,
-                    email
+                    email,
+                    firma
                 )
             `)
             .order('id', { ascending: false });
@@ -104,7 +69,7 @@ async function irReservas() {
         if (error) throw error;
 
         let html = `
-            <table style="width:100%; border-collapse: collapse; background: white; font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <table style="width:100%; border-collapse: collapse; background: white; font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); color: black;">
                 <thead>
                     <tr style="background-color: #2c3e50; color: white; text-align: left;">
                         <th style="padding:10px;">Fecha Registro</th>
@@ -115,6 +80,7 @@ async function irReservas() {
                         <th style="padding:10px;">Dirección</th>
                         <th style="padding:10px;">Email</th>
                         <th style="padding:10px;">Estado</th>
+                        <th style="padding:10px;">Parte</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -127,19 +93,25 @@ async function irReservas() {
 
             (reserva.hospedes || []).forEach((h, index) => {
                 html += `
-                    <tr style="border-bottom: 1px solid #000000;">
-                        <td style="padding:10px; color: #666; ">${index === 0 ? fechaRegistro : ''}</td>
-                        <td style="padding:10px; font-weight: bold; color:black;">${h.nombre} ${h.apellidos}</td>
-                        <td style="padding:10px; color:black;">${h.codigo_documento}</td>
-                        <td style="padding:10px; color:black;">${h.genero || '---'}</td>
-                        <td style="padding:10px; color:black;">${h.fecha_nacimiento || '---'}</td>
-                        <td style="padding:10px; color:black;">${h.direccion || '---'}</td>
-                        <td style="padding:10px; color:black;">${h.email}</td>
-                        <td style="padding:10px; color:black;">
+                    <tr style="border-bottom: 1px solid #000; color: black;">
+                        <td style="padding:10px;">${index === 0 ? fechaRegistro : ''}</td>
+                        <td style="padding:10px; font-weight: bold;">${h.nombre} ${h.apellidos}</td>
+                        <td style="padding:10px;">${h.codigo_documento}</td>
+                        <td style="padding:10px;">${h.genero || '---'}</td>
+                        <td style="padding:10px;">${h.fecha_nacimiento || '---'}</td>
+                        <td style="padding:10px;">${h.direccion || '---'}</td>
+                        <td style="padding:10px;">${h.email}</td>
+                        <td style="padding:10px;">
                             ${index === 0 ? `
                             <span style="padding: 3px 7px; border-radius: 4px; color: white; font-size: 11px; background: ${reserva.estado_estancia === 'finalizada' ? '#e74c3c' : '#2ecc71'};">
                                 ${reserva.estado_estancia || 'activa'}
                             </span>` : ''}
+                        </td>
+                        <td style="padding:10px;">
+                        <button onclick='xerarPDF(${JSON.stringify(h)}, "${fechaRegistro}")' 
+                                style="cursor:pointer; background:#3498db; color:white; border:none; padding:5px; border-radius:3px;">
+                            📄 PDF
+                        </button>
                         </td>
                     </tr>
                 `;
@@ -154,26 +126,81 @@ async function irReservas() {
     }
 }
 
-const CLAVE_ADMIN = "propietario123"; // La clave que tú quieras
+// --- OTRAS FUNCIONES ---
 
-function irCamaras() {
-    const pass = prompt("Introduce la clave de seguridad para ver las cámaras:");
-    if (pass === CLAVE_ADMIN) {
-        window.location.href = "http://10.182.60.63/zm/index.php";
-    } else {
-        alert("Clave incorrecta");
+async function abrirCajon() {
+    try {
+        const res = await fetch(IP_Raspberry);
+        if (res.ok) {
+            alert("✅ ¡Cajón abierto!");
+        } else {
+            alert("⚠️ El cajón no responde.");
+        }
+    } catch (e) {
+        alert("❌ ERROR de conexión.");
     }
 }
 
-// Modifica el inicio de tu función irReservas para que incluya esto:
-async function irReservas() {
-    const pass = prompt("Introduce la clave de seguridad para ver la base de datos:");
-    if (pass !== CLAVE_ADMIN) {
-        alert("Clave incorrecta");
-        return;
+async function finalizarEstancia() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('reservas')
+            .select('*')
+            .order('id', { ascending: false })
+            .limit(1);
+
+        if (error || !data.length) {
+            alert("No hay reservas."); return;
+        }
+
+        const { error: updateError } = await supabaseClient
+            .from('reservas')
+            .update({ estado_estancia: 'finalizada' })
+            .eq('id', data[0].id);
+
+        if (!updateError) alert("✅ Estancia finalizada");
+    } catch (err) {
+        alert("Error inesperado");
     }
+}
+function xerarPDF(h, fecha) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // --- CABECEIRA E DATOS (IGUAL QUE ANTES) ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("PARTE DE ENTRADA DE VIAXEIROS", 105, 20, { align: "center" });
     
-    // ... aquí sigue todo el código que ya teníamos de la tabla ...
-    let seccion = document.getElementById('seccion-reservas');
-    // (Resto del código igual)
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Nome e Apelidos: ${h.nombre} ${h.apellidos}`, 20, 65);
+    doc.text(`DNI / Pasaporte: ${h.codigo_documento}`, 20, 75);
+    doc.text(`Data de entrada: ${fecha}`, 20, 115);
+
+    // --- SECCIÓN DA FIRMA ---
+    doc.text("Firma do viaxeiro:", 20, 128);
+    doc.rect(20, 130, 80, 40); // O recadro visual
+
+    // 🚩 AQUÍ ESTÁ A MAXIA: Engadir a imaxe da firma
+    if (h.firma && h.firma.startsWith('data:image')) {
+        try {
+            // addImage(datos_base64, formato, x, y, ancho, alto)
+            doc.addImage(h.firma, 'PNG', 25, 135, 70, 30); 
+        } catch (e) {
+            console.error("Erro ao cargar a firma no PDF", e);
+            doc.text("[ Erro ao cargar a firma ]", 30, 150);
+        }
+    } else {
+        doc.setFontSize(10);
+        doc.setTextColor(150, 0, 0); // Cor vermella suave
+        doc.text("FIRMA NON DISPOÑIBLE", 35, 155);
+        doc.setTextColor(0, 0, 0); // Volver ao negro
+    }
+
+    // Nota legal ao final
+    doc.setFontSize(9);
+    doc.text("Este documento é copia fiel do rexistro electrónico realizado na tablet de entrada.", 20, 185);
+
+    doc.save(`Parte_${h.codigo_documento}.pdf`);
 }
