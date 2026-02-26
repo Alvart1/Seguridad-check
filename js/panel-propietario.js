@@ -167,38 +167,62 @@ function xerarPDF(h, fecha) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // --- CABECEIRA E DATOS ---
+    // --- CONFIGURACIÓN DE ESTILO ---
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.text("PARTE DE ENTRADA DE VIAXEIROS", 105, 20, { align: "center" });
     
-    doc.setFontSize(12);
+    // Liña decorativa
+    doc.setLineWidth(0.5);
+    doc.line(20, 25, 190, 25);
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text("DATOS DO ALOXAMENTO:", 20, 40);
+    
     doc.setFont("helvetica", "normal");
-    doc.text(`Nome e Apelidos: ${h.nombre} ${h.apellidos}`, 20, 65);
-    doc.text(`DNI / Pasaporte: ${h.codigo_documento}`, 20, 75);
-    doc.text(`Data de entrada: ${fecha}`, 20, 115);
+    doc.text("Establecemento: O teu Aloxamento", 20, 47); // Podes cambiar isto polo nome real
+    doc.text(`Data de entrada: ${fecha}`, 20, 54);
+
+    // --- DATOS DO HÓSPEDE ---
+    doc.setFont("helvetica", "bold");
+    doc.text("DATOS DO VIAXEIRO:", 20, 70);
+    
+    doc.setFont("helvetica", "normal");
+    let y = 77; // Posición vertical inicial para os datos
+    const salto = 7; // Espazo entre liñas
+
+    doc.text(`Nome e Apelidos: ${h.nombre} ${h.apellidos}`, 20, y);
+    doc.text(`DNI / Pasaporte: ${h.codigo_documento}`, 20, y + salto);
+    doc.text(`Xénero: ${h.genero || 'Non especificado'}`, 20, y + (salto * 2));
+    doc.text(`Data de nacemento: ${h.fecha_nacimiento || '---'}`, 20, y + (salto * 3));
+    doc.text(`Enderezo: ${h.direccion || '---'}`, 20, y + (salto * 4));
+    doc.text(`Email: ${h.email || '---'}`, 20, y + (salto * 5));
 
     // --- SECCIÓN DA FIRMA ---
-    doc.text("Firma do viaxeiro:", 20, 128);
-    doc.rect(20, 130, 80, 40); 
+    doc.setFont("helvetica", "bold");
+    doc.text("FIRMA DO VIAXEIRO:", 20, 135);
+    doc.rect(20, 140, 80, 40); // O recadro
 
-    // 🚩 CORRECCIÓN AQUÍ: h.firma_base64 en ambos sitios
     if (h.firma_base64 && h.firma_base64.startsWith('data:image')) {
         try {
-            doc.addImage(h.firma_base64, 'PNG', 25, 135, 70, 30); 
+            // Axustamos a firma dentro do recadro
+            doc.addImage(h.firma_base64, 'PNG', 25, 145, 70, 30); 
         } catch (e) {
-            console.error("Erro ao cargar a firma no PDF", e);
-            doc.text("[ Erro ao cargar a firma ]", 30, 150);
+            doc.text("[ Erro ao cargar a firma ]", 30, 160);
         }
     } else {
-        doc.setFontSize(10);
-        doc.setTextColor(150, 0, 0); 
-        doc.text("FIRMA NON DISPOÑIBLE", 35, 155);
-        doc.setTextColor(0, 0, 0); 
+        doc.setTextColor(150, 0, 0);
+        doc.text("FIRMA NON DISPOÑIBLE", 35, 165);
+        doc.setTextColor(0, 0, 0);
     }
 
-    doc.setFontSize(9);
-    doc.text("Este documento é copia fiel do rexistro electrónico realizado na tablet de entrada.", 20, 185);
+    // --- PE DE PÁXINA LEGAL ---
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    const textoLegal = "Este documento é copia fiel do rexistro electrónico realizado na tablet de entrada en cumprimento da normativa vixente de seguridade cidadá.";
+    const liñasLegais = doc.splitTextToSize(textoLegal, 170);
+    doc.text(liñasLegais, 20, 200);
 
     doc.save(`Parte_${h.codigo_documento}.pdf`);
 }
