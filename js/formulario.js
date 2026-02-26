@@ -107,7 +107,7 @@ async function enviarFormulario(e) {
         direccion: document.getElementById('direccion').value,  
         fecha_nacimiento: document.getElementById('fecha_nac').value,
         email: document.getElementById('correo').value,
-        firma: firmaImagen // Agora si se garda no PDF
+        firma_base64: firmaImagen // Agora si se garda no PDF
     };
 
     const { error } = await _supabase.from('hospedes').insert([datos]);
