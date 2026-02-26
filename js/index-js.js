@@ -20,7 +20,8 @@ let tempoInactividade; // Declaramos fóra para que sexa global
 
 function verificarYGenerar() {
     const pinCorrecto = "1234"; 
-    const urlDestino = "https://alvart1.github.io/Seguridad-check/formulario.html";
+    // Añadimos un parámetro a la URL para que el formulario sepa que viene del QR
+    const urlDestino = "https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok";
     
     const input = document.getElementById("pinInput");
     const inicio = document.getElementById("pantalla-inicio");
@@ -28,23 +29,17 @@ function verificarYGenerar() {
     const contenedorQR = document.getElementById("qrcode");
 
     if (input.value === pinCorrecto) {
-        // 1. DETEMOS calquera redirección automática por inactividade
         clearTimeout(tempoInactividade);
-
-        // 2. Autorizamos a sesión
         sessionStorage.setItem('tablet_desbloqueada', 'true');
 
-        // 3. Comprobamos rexistro previo
         const xaRexistrado = localStorage.getItem('hospede_rexistrado');
 
         if (xaRexistrado === 'true') {
-            // USAMOS .replace PARA EVITAR QUE O BOTÓN "ATRÁS" DEN ERROS
             window.location.replace("acceso-llaves.html"); 
         } else {
-            // Xeramos o QR para o novo cliente
             contenedorQR.innerHTML = ""; 
             new QRCode(contenedorQR, {
-                text: urlDestino,
+                text: urlDestino, // Ahora el QR lleva el "pase VIP"
                 width: 250,
                 height: 250
             });
@@ -52,7 +47,9 @@ function verificarYGenerar() {
             inicio.style.display = "none";
             resultado.style.display = "flex";
             
-            // Iniciamos o timer só agora que o QR é visible
+            // Actualizamos también el enlace de texto por si acaso
+            document.querySelector(".enlace-secreto").href = urlDestino;
+            
             resetTimer();
         }
     } else {

@@ -9,14 +9,19 @@ const Templace_ID_emailjs = 'template_5m1y4si';
 let totalHospedes = 0, hospedeActual = 1, reservaId = null;
 
 // --- CONTROL DE ACCESO ---
-window.onload = function() {
-    // Seguridade: Se non puxeron o PIN no index, de volta ao inicio
-    if (!sessionStorage.getItem('tablet_desbloqueada')) {
-        window.location.href = "index.html";
-        return;
+// Comprobar si venimos del QR (parámetro en la URL)
+const urlParams = new URLSearchParams(window.location.search);
+const accesoQR = urlParams.get('auth') === 'ok';
+
+if (sessionStorage.getItem('tablet_desbloqueada') !== 'true' && !accesoQR) {
+    // Si no es la tablet y no viene con el parámetro del QR, al index
+    window.location.href = "index.html";
+} else {
+    // Si entramos por QR en el móvil, autorizamos también esta sesión de móvil
+    if (accesoQR) {
+        sessionStorage.setItem('tablet_desbloqueada', 'true');
     }
-    mostrarSeccion('paso-inicio');
-};
+}
 
 function mostrarSeccion(id) {
     document.querySelectorAll('.encabezado, .viajero-bloque').forEach(sec => sec.style.display = 'none');
