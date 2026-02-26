@@ -65,8 +65,7 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
     };
 
     const { error } = await _supabase.from('hospedes').insert([datos]);
-    // ... resto del código
-    const { error } = await _supabase.from('hospedes').insert([datos]);
+
     
     if (!error) {
         if (hospedeActual < totalHospedes) {
