@@ -61,7 +61,7 @@ async function irReservas() {
                     direccion,
                     fecha_nacimiento,
                     email,
-                    firma
+                    firma_base64
                 )
             `)
             .order('id', { ascending: false });
@@ -108,9 +108,9 @@ async function irReservas() {
                             </span>` : ''}
                         </td>
                         <td style="padding:10px;">
-                        <button onclick='xerarPDF(${JSON.stringify(h)}, "${fechaRegistro}")' 
-                                style="cursor:pointer; background:#3498db; color:white; border:none; padding:5px; border-radius:3px;">
-                            📄 PDF
+                        <button onclick='xerarPDF(${JSON.stringify(h).replace(/'/g, "&apos;")}, "${fechaRegistro}")' 
+                        style="cursor:pointer; background:#3498db; color:white; border:none; padding:5px; border-radius:3px;">
+                         PDF
                         </button>
                         </td>
                     </tr>
@@ -167,7 +167,7 @@ function xerarPDF(h, fecha) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // --- CABECEIRA E DATOS (IGUAL QUE ANTES) ---
+    // --- CABECEIRA E DATOS ---
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.text("PARTE DE ENTRADA DE VIAXEIROS", 105, 20, { align: "center" });
@@ -180,25 +180,23 @@ function xerarPDF(h, fecha) {
 
     // --- SECCIÓN DA FIRMA ---
     doc.text("Firma do viaxeiro:", 20, 128);
-    doc.rect(20, 130, 80, 40); // O recadro visual
+    doc.rect(20, 130, 80, 40); 
 
-    // 🚩 AQUÍ ESTÁ A MAXIA: Engadir a imaxe da firma
-    if (h.firma && h.firma.startsWith('data:image')) {
+    // 🚩 CORRECCIÓN AQUÍ: h.firma_base64 en ambos sitios
+    if (h.firma_base64 && h.firma_base64.startsWith('data:image')) {
         try {
-            // addImage(datos_base64, formato, x, y, ancho, alto)
-            doc.addImage(h.firma, 'PNG', 25, 135, 70, 30); 
+            doc.addImage(h.firma_base64, 'PNG', 25, 135, 70, 30); 
         } catch (e) {
             console.error("Erro ao cargar a firma no PDF", e);
             doc.text("[ Erro ao cargar a firma ]", 30, 150);
         }
     } else {
         doc.setFontSize(10);
-        doc.setTextColor(150, 0, 0); // Cor vermella suave
+        doc.setTextColor(150, 0, 0); 
         doc.text("FIRMA NON DISPOÑIBLE", 35, 155);
-        doc.setTextColor(0, 0, 0); // Volver ao negro
+        doc.setTextColor(0, 0, 0); 
     }
 
-    // Nota legal ao final
     doc.setFontSize(9);
     doc.text("Este documento é copia fiel do rexistro electrónico realizado na tablet de entrada.", 20, 185);
 
