@@ -1,4 +1,5 @@
 // --- CONFIGURACIÓN ---
+// --- CONFIGURACIÓN ---
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
 const _supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
@@ -10,25 +11,46 @@ let totalHospedes = 0, hospedeActual = 1, reservaId = null;
 let canvas, ctx, debuxando = false;
 let tempoInactividade;
 
-// --- 1. CONTROL DE ACCESO (Execútase ao cargar) ---
+// 🚩 CONTROL DE ERROS INICIAL
+window.onerror = function(msg, url, line) {
+    const debug = document.getElementById('debug-error');
+    if (debug) {
+        debug.style.display = 'block';
+        debug.innerText = "ERRO: " + msg + " en liña " + line;
+    }
+    return false;
+};
+
+// --- 1. CONTROL DE ACCESO ---
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("Páxina cargada. Comprobando acceso...");
+    
     const urlParams = new URLSearchParams(window.location.search);
     const accesoQR = urlParams.get('auth') === 'ok';
 
-    // Se non hai sesión e non ven do QR, fóra
     if (sessionStorage.getItem('tablet_desbloqueada') !== 'true' && !accesoQR) {
+        console.log("Acceso denegado. Redirixindo...");
         window.location.href = "index.html";
         return;
     }
 
-    // Se ven do QR, autorizamos o móbil
     if (accesoQR) {
         sessionStorage.setItem('tablet_desbloqueada', 'true');
     }
 
-    // Unha vez autorizado, inicializamos todo
+    // 🚩 FORZAMOS QUE SE VEXA A PRIMEIRA SECCIÓN
+    // Asegúrate de que o ID coincide co que tes no HTML (pode ser 'seccion-inicial' ou similar)
+    const seccionInicial = document.querySelector('.encabezado'); 
+    if (seccionInicial) {
+        seccionInicial.style.display = 'block';
+    } else {
+        alert("Non se atopou a sección inicial no HTML");
+    }
+
     inicializarTodo();
 });
+
+// ... resto das funcións igual ...
 
 // --- 2. INICIALIZACIÓN DE ELEMENTOS ---
 function inicializarTodo() {
