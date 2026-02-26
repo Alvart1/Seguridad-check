@@ -49,6 +49,9 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const canvas = document.getElementById('canvas-firma');
+    // Convertimos el dibujo del canvas a una imagen de texto (Base64)
+    const firmaImagen = canvas.toDataURL(); 
+
     const datos = { 
         reserva_id: reservaId,
         nombre: document.getElementById('nombre').value,
@@ -57,9 +60,12 @@ document.getElementById('formulario').addEventListener('submit', async (e) => {
         codigo_documento: document.getElementById('documento').value,
         direccion: document.getElementById('direccion').value,  
         fecha_nacimiento: document.getElementById('fecha_nac').value,
-        email: document.getElementById('correo').value
+        email: document.getElementById('correo').value,
+        firma: firmaImagen // <--- AÑADE ESTA LÍNEA PARA QUE EL PDF TENGA FIRMA
     };
 
+    const { error } = await _supabase.from('hospedes').insert([datos]);
+    // ... resto del código
     const { error } = await _supabase.from('hospedes').insert([datos]);
     
     if (!error) {
