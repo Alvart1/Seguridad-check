@@ -6,22 +6,21 @@ document.querySelector(".titulo h1").onclick = function() {
     clicsSecretos++;
     if (clicsSecretos === 5) {
         const pass = prompt("Acceso Restringido. Introduce la clave maestra:");
-        if (pass === "abc123.") { // Cambia esta clave a tu gusto
+        if (pass === "abc123.") { 
             window.location.href = "panel-propietario.html";
         } else {
             alert("Acceso denegado");
             clicsSecretos = 0;
         }
     }
-    // Reiniciar contador si no completa los 5 clics en 3 segundos
     setTimeout(() => { clicsSecretos = 0; }, 3000);
 };
 
-let tempoInactividade; // Declaramos fóra para que sexa global
+let tempoInactividade; 
 
 function verificarYGenerar() {
     const pinCorrecto = "1234"; 
-    // Añadimos un parámetro a la URL para que el formulario sepa que viene del QR
+    // Esta é a URL que o cliente verá no seu móbil ao escanear
     const urlDestino = "https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok";
     
     const input = document.getElementById("pinInput");
@@ -30,53 +29,49 @@ function verificarYGenerar() {
     const contenedorQR = document.getElementById("qrcode");
 
     if (input.value === pinCorrecto) {
-        clearTimeout(tempoInactividade);
+        // Se acertamos o PIN, limpamos o rastro de "xa rexistrado" para novos clientes
         sessionStorage.setItem('tablet_desbloqueada', 'true');
 
-        const xaRexistrado = localStorage.getItem('hospede_rexistrado');
+        // Limpamos o contido anterior do QR para que non se amontonen
+        contenedorQR.innerHTML = ""; 
 
-        if (xaRexistrado === 'true') {
-            window.location.replace("acceso-llaves.html"); 
-        } else {
-            contenedorQR.innerHTML = ""; 
-            new QRCode(contenedorQR, {
-                text: urlDestino, // Ahora el QR lleva el "pase VIP"
-                width: 250,
-                height: 250
-            });
+        // Xerar o QR
+        new QRCode(contenedorQR, {
+            text: urlDestino,
+            width: 250,
+            height: 250,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
 
-            inicio.style.display = "none";
-            resultado.style.display = "flex";
-            
-            // Actualizamos también el enlace de texto por si acaso
-            const enlace = document.querySelector(".enlace-secreto");
-            if(enlace) enlace.href = urlDestino;
-            
-            resetTimer();
+        // CAMBIO DE PANTALLA: Aquí é onde se pon azul se o CSS así o di
+        inicio.style.display = "none";
+        resultado.style.display = "flex"; 
+        
+        // Se tes un enlace de texto debaixo do QR, actualizámolo
+        const enlaceEscrito = document.querySelector(".enlace-secreto");
+        if (enlaceEscrito) {
+            enlaceEscrito.href = urlDestino;
         }
+        
+        resetTimer();
     } else {
         alert("PIN INCORRECTO");
         input.value = "";
     }
 }
 
-// --- XESTIÓN DE INACTIVIDADE ---
 function resetTimer() {
     clearTimeout(tempoInactividade);
-    
-    // IMPORTANTE: Só activamos o timer se o QR está na pantalla.
     const pantallaResultado = document.getElementById("pantalla-resultado");
-    const qrVisible = pantallaResultado && pantallaResultado.style.display === "flex";
-
-    if (qrVisible) {
+    if (pantallaResultado && pantallaResultado.style.display === "flex") {
         tempoInactividade = setTimeout(() => {
-            sessionStorage.removeItem('tablet_desbloqueada');
-            window.location.reload(); // Recarga para volver ao estado inicial
+            window.location.reload(); 
         }, 300000); // 5 minutos
     }
 }
 
-// Escoitar interaccións
+// Interaccións para que a tablet non se apague mentres se usa
 document.onmousemove = resetTimer;
-document.onkeypress = resetTimer;
 document.ontouchstart = resetTimer;
