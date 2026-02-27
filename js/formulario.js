@@ -1,7 +1,7 @@
 // --- CONFIGURACIÓN ---
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
-const _supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
+const supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
 const Public_KEY_Emailjs = '-7vKXPKDrKzQiVSrn';
 const Service_ID_emailjs = 'service_cog5jua';
 const Templace_ID_emailjs = 'template_5m1y4si';
@@ -89,7 +89,7 @@ async function comezarRexistro(numero) {
     } else {
         // Se non hai ID na URL (caso raro de uso manual na tablet), creamos unha nova
         try {
-            const { data, error } = await _supabase
+            const { data, error } = await supabase
                 .from('reservas')
                 .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
                 .select();
@@ -120,7 +120,7 @@ async function enviarFormulario(e) {
         firma_base64: firmaImagen 
     };
 
-    const { error } = await _supabase.from('hospedes').insert([datos]);
+    const { error } = await supabase.from('hospedes').insert([datos]);
 
     if (!error) {
         if (hospedeActual < totalHospedes) {
