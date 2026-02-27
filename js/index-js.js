@@ -1,34 +1,21 @@
-// 1. CONFIGURACIÓN (Sempre debe ir na primeira liña para que o código a coñeza)
-const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
-const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
-
-// Aquí inicializamos a variable. Agora calquera función de abaixo xa a pode usar.
-const supabase = supabase.createClient(URL_SUPA, KEY_SUPA); 
-
-// 2. VARIABLES DE ESTADO
 let tempoInactividade;
 let reservaIdActual = null; 
 let clicsSecretos = 0;
 
 // --- ACCESO AO PANEL DE PROPIETARIO (CLICS SECRETOS) ---
-document.addEventListener("DOMContentLoaded", () => {
-    const titulo = document.querySelector(".titulo h1");
-    if (titulo) {
-        titulo.onclick = function() {
-            clicsSecretos++;
-            if (clicsSecretos === 5) {
-                const pass = prompt("Acceso Restringido. Introduce la clave maestra:");
-                if (pass === "abc123.") {
-                    window.location.href = "panel-propietario.html";
-                } else {
-                    alert("Acceso denegado");
-                    clicsSecretos = 0;
-                }
-            }
-            setTimeout(() => { clicsSecretos = 0; }, 3000);
-        };
+document.querySelector(".titulo h1").onclick = function() {
+    clicsSecretos++;
+    if (clicsSecretos === 5) {
+        const pass = prompt("Acceso Restringido. Introduce la clave maestra:");
+        if (pass === "abc123.") {
+            window.location.href = "panel-propietario.html";
+        } else {
+            alert("Acceso denegado");
+            clicsSecretos = 0;
+        }
     }
-});
+    setTimeout(() => { clicsSecretos = 0; }, 3000);
+};
 
 // --- FUNCIÓN PRINCIPAL: DESBLOQUEO E XERACIÓN DE QR ---
 async function verificarYGenerar() {
@@ -37,7 +24,6 @@ async function verificarYGenerar() {
 
     if (input.value === pinCorrecto) {
         try {
-            // Agora xa non dará erro de inicialización porque 'supabase' definise na liña 6
             const { data, error } = await supabase
                 .from('reservas')
                 .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
@@ -46,6 +32,7 @@ async function verificarYGenerar() {
             if (error) throw error;
 
             reservaIdActual = data[0].id; 
+
             const urlDestino = `https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok&reserva_id=${reservaIdActual}`;
             
             const contenedorQR = document.getElementById("qrcode");
@@ -82,7 +69,8 @@ function activarEscoitaRealtime(id) {
           filter: `reserva_id=eq.${id}` 
       }, (payload) => {
           confirmarRexistroExitoso(payload.new.nombre);
-      }).subscribe();
+      })
+      .subscribe();
 }
 
 function confirmarRexistroExitoso(nombre) {
@@ -99,14 +87,9 @@ function confirmarRexistroExitoso(nombre) {
     `;
 }
 
-function abrirCajon() {
-    window.location.href = "crear-cuenta.html";
-}
-
 function resetTimer() {
     clearTimeout(tempoInactividade);
     tempoInactividade = setTimeout(() => {
-        sessionStorage.removeItem('tablet_desbloqueada');
         window.location.reload();
     }, 300000);
 }

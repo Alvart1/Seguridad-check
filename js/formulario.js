@@ -1,12 +1,10 @@
 // --- CONFIGURACIÓN ---
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
-const supabase = supabase.createClient(URL_SUPA, KEY_SUPA); // Variable unificada
-
+const supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
 const Public_KEY_Emailjs = '-7vKXPKDrKzQiVSrn';
 const Service_ID_emailjs = 'service_cog5jua';
 const Templace_ID_emailjs = 'template_5m1y4si';
-
 const urlParams = new URLSearchParams(window.location.search);
 const reservaIdDendeURL = urlParams.get('reserva_id');
 
@@ -24,50 +22,52 @@ window.onerror = function(msg, url, line) {
     return false;
 };
 
-// --- 1. CONTROL DE ACCESO E INICIO ---
+// --- 1. CONTROL DE ACCESO ---
 document.addEventListener("DOMContentLoaded", () => {
     const accesoQR = urlParams.get('auth') === 'ok';
-
-    // Se non vén do QR e non está desbloqueada a sesión, volve ao inicio
     if (sessionStorage.getItem('tablet_desbloqueada') !== 'true' && !accesoQR) {
         window.location.href = "index.html";
         return;
     }
-
-    if (accesoQR) {
-        sessionStorage.setItem('tablet_desbloqueada', 'true');
-    }
-
-    // Amosar a sección de cantos hóspedes son
+    if (accesoQR) sessionStorage.setItem('tablet_desbloqueada', 'true');
+    
+    // Amosar a sección de cantos hóspedes son se estamos no inicio
     const seccionInicial = document.querySelector('.encabezado'); 
-    if (seccionInicial) {
-        seccionInicial.style.display = 'block';
-    }
+    if (seccionInicial) seccionInicial.style.display = 'block';
 
     inicializarTodo();
 });
 
 function inicializarTodo() {
-    // Inicializar EmailJS
     emailjs.init(Public_KEY_Emailjs);
-
-    // Configurar Canvas para a firma
     canvas = document.getElementById('canvas-firma');
     if (canvas) {
         ctx = canvas.getContext('2d');
         configurarFirma();
     }
-
     resetTimer();
-    
-    // Escoitar o envío do formulario
-    const form = document.getElementById('formulario');
-    if (form) {
-        form.addEventListener('submit', enviarFormulario);
-    }
+    document.getElementById('formulario').addEventListener('submit', enviarFormulario);
 }
 
-// --- 2. LÓXICA DE SECCIÓNS E REXISTRO ---
+// --- 2. LÓXICA DE SECCIÓNS ---
+async function comezarRexistro(numero) {
+    totalHospedes = numero;
+    if (reservaIdDendeURL) {
+        reservaId = reservaIdDendeURL;
+        mostrarSeccion('seccion-formulario');
+    } else {
+        try {
+            const { data, error } = await supabase.from('reservas').insert([{ 
+                fecha_entrada: new Date().toISOString().split('T')[0] 
+            }]).select();
+            if (error) throw error;
+            reservaId = data[0].id;
+            mostrarSeccion('seccion-formulario');
+        } catch (err) {
+            alert("Erro ao conectar coa base de datos");
+        }
+    }
+}
 
 function mostrarSeccion(id) {
     document.querySelectorAll('.encabezado, .viajero-bloque, #seccion-formulario').forEach(sec => sec.style.display = 'none');
@@ -75,35 +75,12 @@ function mostrarSeccion(id) {
     if (elemento) elemento.style.display = 'block';
 }
 
-async function comezarRexistro(numero) {
-    totalHospedes = numero;
-    
-    // Se xa temos a ID pola URL (vía QR), usámola
-    if (reservaIdDendeURL) {
-        reservaId = reservaIdDendeURL;
-        mostrarSeccion('seccion-formulario');
-    } else {
-        // Se non, creamos unha reserva nova (uso manual)
-        try {
-            const { data, error } = await supabase.from('reservas').insert([{ 
-                fecha_entrada: new Date().toISOString().split('T')[0] 
-            }]).select();
-            
-            if (error) throw error;
-            reservaId = data[0].id;
-            mostrarSeccion('seccion-formulario');
-        } catch (err) {
-            alert("Erro ao conectar coa base de datos: " + err.message);
-        }
-    }
-}
-
+// --- 3. PROCESO DE ENVÍO ---
 async function enviarFormulario(e) {
     e.preventDefault();
-    
-    // Capturar a firma en formato imaxe (Base64)
     const firmaImagen = canvas.toDataURL(); 
 
+    // AQUÍ RECUPERAMOS TODOS OS CAMPOS DO TEU HTML
     const datos = { 
         reserva_id: parseInt(reservaIdDendeURL || reservaId), 
         nombre: document.getElementById('nombre').value,
@@ -116,29 +93,26 @@ async function enviarFormulario(e) {
         firma_base64: firmaImagen 
     };
 
-    // GARDAR EN SUPABASE
     const { error } = await supabase.from('hospedes').insert([datos]);
 
     if (!error) {
         if (hospedeActual < totalHospedes) {
-            // Se faltan hóspedes por rexistrar
             hospedeActual++;
             document.getElementById('formulario').reset();
             limparFirma();
             document.getElementById('titulo-formulario').innerText = `Datos do Viaxeiro ${hospedeActual}`;
             window.scrollTo(0,0);
         } else {
-            // Se era o último
             finalizarProceso();
         }
     } else {
-        alert("Erro ao gardar os datos: " + error.message);
+        alert("Erro ao gardar: " + error.message);
     }
 }
 
 async function finalizarProceso() {
     try {
-        // 1. Notificar a Supabase que o check-in está listo (para que a tablet se entere por Realtime)
+        // Rexistramos o evento para que a tablet poida escoitar
         await supabase.from('eventos_sistema').insert([{
             reserva_id: parseInt(reservaIdDendeURL || reservaId),
             tipo_evento: 'checkin_completado',
@@ -146,7 +120,7 @@ async function finalizarProceso() {
             notificado: false
         }]);
 
-        // 2. Enviar email de aviso ao propietario
+        // Enviamos o email de confirmación
         emailjs.send(Service_ID_emailjs, Templace_ID_emailjs, {
             reserva_id: reservaIdDendeURL || reservaId,
             fecha_evento: new Date().toLocaleString(),
@@ -155,77 +129,52 @@ async function finalizarProceso() {
 
         localStorage.setItem('hospede_rexistrado', 'true');
 
-        // 3. Pantalla final
         if (reservaIdDendeURL) {
+            // Se o fai dende o seu móbil (QR)
             document.body.innerHTML = `
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; font-family: sans-serif; background-color: #f4f7f6; padding: 20px;">
                     <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                         <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
                         <h1 style="color: #2ecc71;">¡Rexistro completado!</h1>
-                        <p>Xa podes mirar a tablet da entrada. O caixón das chaves está listo para abrirse.</p>
+                        <p>Agora xa podes usar a tablet da entrada para recoller as túas chaves.</p>
                     </div>
                 </div>`;
         } else {
-            // Se é uso manual na tablet, imos a configurar o PIN de acceso
+            // Se o fai na propia tablet
             window.location.href = "crear-cuenta.html";
         }
 
     } catch (err) {
         console.error(err);
-        alert("O rexistro gardouse, pero houbo un problema ao finalizar o proceso.");
+        alert("O rexistro gardouse, pero houbo un erro ao finalizar.");
     }
 }
 
-// --- 3. FUNCIÓNS DA FIRMA ---
-
+// --- 4. FIRMA E CONTROL ---
 function configurarFirma() {
     const pouse = () => { debuxando = false; ctx.beginPath(); };
     const mover = (e) => {
         if (!debuxando) return;
         const rect = canvas.getBoundingClientRect();
-        
-        // Soporte para rato e pantallas táctiles
         const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
         const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-        
         const x = clientX - rect.left;
         const y = clientY - rect.top;
-        
-        ctx.lineWidth = 2;
-        ctx.lineCap = "round";
-        ctx.strokeStyle = "#000";
-        
         ctx.lineTo(x, y);
         ctx.stroke();
     };
-
     canvas.addEventListener('mousedown', () => debuxando = true);
     canvas.addEventListener('mouseup', pouse);
     canvas.addEventListener('mousemove', mover);
-    
-    // Eventos táctiles para móbiles
-    canvas.addEventListener('touchstart', (e) => { 
-        debuxando = true; 
-        e.preventDefault(); 
-    }, { passive: false });
-    canvas.addEventListener('touchmove', (e) => { 
-        mover(e); 
-        e.preventDefault(); 
-    }, { passive: false });
+    canvas.addEventListener('touchstart', (e) => { debuxando = true; e.preventDefault(); }, {passive: false});
+    canvas.addEventListener('touchmove', (e) => { mover(e); e.preventDefault(); }, {passive: false});
     canvas.addEventListener('touchend', pouse);
 }
 
-function limparFirma() { 
-    if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); 
-    }
-}
-
-// --- 4. OUTROS ---
+function limparFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
 function resetTimer() {
     clearTimeout(tempoInactividade);
-    // Se pasan 5 minutos sen facer nada, volvemos ao inicio por seguridade
     tempoInactividade = setTimeout(() => {
         window.location.href = "index.html";
     }, 300000);
