@@ -24,19 +24,17 @@ async function verificarYGenerar() {
 
     if (input.value === pinCorrecto) {
         try {
-            // 1. CREAMOS unha reserva real en Supabase para ter un ID válido
-            const { data, error } = await supabaseClient
+            // 🚩 REVISA AQUÍ: Se usas _supabase arriba, aquí tamén
+            const { data, error } = await _supabase
                 .from('reservas')
                 .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
                 .select();
 
             if (error) throw error;
 
-            // 2. Usamos o ID real que nos deu a base de datos
             reservaIdActual = data[0].id; 
-            console.log("ID de reserva real creado: " + reservaIdActual);
+            console.log("ID creado con éxito: " + reservaIdActual);
 
-            // 3. Xeramos o QR co ID REAL
             const urlDestino = `https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok&reserva_id=${reservaIdActual}`;
             
             const contenedorQR = document.getElementById("qrcode");
@@ -50,12 +48,12 @@ async function verificarYGenerar() {
             document.getElementById("pantalla-inicio").style.display = "none";
             document.getElementById("pantalla-resultado").style.display = "flex";
 
-            // 4. A tablet queda escoitando ese ID real
+            // 🚩 REVISA AQUÍ: Chama á escoita coa variable correcta
             activarEscoitaRealtime(reservaIdActual);
             resetTimer();
 
         } catch (err) {
-            alert("Erro ao crear reserva en Supabase: " + err.message);
+            alert("Erro ao conectar con Supabase: " + err.message);
         }
     } else {
         alert("PIN INCORRECTO");
@@ -67,7 +65,8 @@ async function verificarYGenerar() {
 function activarEscoitaRealtime(id) {
     console.log("Tablet agardando por: " + id);
     
-    supabaseClient
+    // Cambia 'supabaseClient' por '_supabase' se esa é a túa variable constante
+    _supabase
       .channel('cambios-hospedes')
       .on(
         'postgres_changes', 
