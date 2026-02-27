@@ -1,10 +1,28 @@
-// 1. CONFIGURACIÓN (O que che faltaba)
+// --- 1. CONFIGURACIÓN INICIAL (Obligatoria para que funcione) ---
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
-const supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
+const supabase = supabase.createClient(URL_SUPA, KEY_SUPA); 
+
 let tempoInactividade;
 let reservaIdActual = null; 
 let clicsSecretos = 0;
+
+// --- ACCESO AO PANEL DE PROPIETARIO ---
+if (document.querySelector(".titulo h1")) {
+    document.querySelector(".titulo h1").onclick = function() {
+        clicsSecretos++;
+        if (clicsSecretos === 5) {
+            const pass = prompt("Acceso Restringido. Introduce la clave maestra:");
+            if (pass === "abc123.") {
+                window.location.href = "panel-propietario.html";
+            } else {
+                alert("Acceso denegado");
+                clicsSecretos = 0;
+            }
+        }
+        setTimeout(() => { clicsSecretos = 0; }, 3000);
+    };
+}
 
 // --- FUNCIÓN PRINCIPAL: DESBLOQUEO E XERACIÓN DE QR ---
 async function verificarYGenerar() {
@@ -13,7 +31,7 @@ async function verificarYGenerar() {
 
     if (input.value === pinCorrecto) {
         try {
-            // CORREGIDO: Usamos 'supabase'
+            // Agora 'supabase' xa está definido arriba
             const { data, error } = await supabase
                 .from('reservas')
                 .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
@@ -49,22 +67,16 @@ async function verificarYGenerar() {
 
 // --- REALTIME: ESCOITAR AO MÓBIL ---
 function activarEscoitaRealtime(id) {
-    // CORREGIDO: Usamos 'supabase' sin guion
     supabase
       .channel('cambios-hospedes')
-      .on(
-        'postgres_changes', 
-        { 
+      .on('postgres_changes', { 
           event: 'INSERT', 
           schema: 'public', 
           table: 'hospedes',
           filter: `reserva_id=eq.${id}` 
-        }, 
-        (payload) => {
-            confirmarRexistroExitoso(payload.new.nombre);
-        }
-      )
-      .subscribe();
+      }, (payload) => {
+          confirmarRexistroExitoso(payload.new.nombre);
+      }).subscribe();
 }
 
 function confirmarRexistroExitoso(nombre) {
@@ -79,6 +91,10 @@ function confirmarRexistroExitoso(nombre) {
             </button>
         </div>
     `;
+}
+
+function abrirCajon() {
+    window.location.href = "crear-cuenta.html";
 }
 
 function resetTimer() {
