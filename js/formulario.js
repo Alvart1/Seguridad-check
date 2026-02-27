@@ -54,30 +54,45 @@ document.addEventListener("DOMContentLoaded", () => {
 // ... resto das funcións igual ...
 
 // --- 2. INICIALIZACIÓN DE ELEMENTOS ---
+// --- 2. INICIALIZACIÓN DE ELEMENTOS ---
 function inicializarTodo() {
     // Inicializar EmailJS
     emailjs.init(Public_KEY_Emailjs);
 
     // Inicializar Canvas
     canvas = document.getElementById('canvas-firma');
-    ctx = canvas.getContext('2d');
-    configurarFirma();
+    if (canvas) {
+        ctx = canvas.getContext('2d');
+        configurarFirma();
+    }
 
     // Configurar Timer
     resetTimer();
     document.onmousedown = resetTimer;
 
     // Escoitar o envío do formulario
-    document.getElementById('formulario').addEventListener('submit', enviarFormulario);
+    const form = document.getElementById('formulario');
+    if (form) {
+        form.addEventListener('submit', enviarFormulario);
+    }
 }
 
 // --- 3. LÓXICA DE NEGOCIO ---
 function mostrarSeccion(id) {
-    document.querySelectorAll('.encabezado, .viajero-bloque').forEach(sec => sec.style.display = 'none');
+    // Ocultamos todo primero
+    document.querySelectorAll('.encabezado, .viajero-bloque').forEach(sec => {
+        sec.style.display = 'none';
+    });
+    
+    // Mostramos la sección específica
     const elemento = document.getElementById(id);
-    if (elemento) elemento.style.display = 'block';
+    if (elemento) {
+        elemento.style.display = 'block';
+        console.log("Mostrando sección: " + id);
+    } else {
+        console.error("No se encontró el ID: " + id);
+    }
 }
-
 async function comezarRexistro(numero) {
     totalHospedes = numero;
     
