@@ -2,21 +2,6 @@ let tempoInactividade;
 let reservaIdActual = null; 
 let clicsSecretos = 0;
 
-// --- ACCESO AO PANEL DE PROPIETARIO (CLICS SECRETOS) ---
-document.querySelector(".titulo h1").onclick = function() {
-    clicsSecretos++;
-    if (clicsSecretos === 5) {
-        const pass = prompt("Acceso Restringido. Introduce la clave maestra:");
-        if (pass === "abc123.") {
-            window.location.href = "panel-propietario.html";
-        } else {
-            alert("Acceso denegado");
-            clicsSecretos = 0;
-        }
-    }
-    setTimeout(() => { clicsSecretos = 0; }, 3000);
-};
-
 // --- FUNCIÓN PRINCIPAL: DESBLOQUEO E XERACIÓN DE QR ---
 async function verificarYGenerar() {
     const pinCorrecto = "1234"; 
@@ -24,7 +9,7 @@ async function verificarYGenerar() {
 
     if (input.value === pinCorrecto) {
         try {
-            // 🚩 REVISA AQUÍ: Se usas supabase arriba, aquí tamén
+            // CORREGIDO: Usamos 'supabase'
             const { data, error } = await supabase
                 .from('reservas')
                 .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
@@ -33,8 +18,6 @@ async function verificarYGenerar() {
             if (error) throw error;
 
             reservaIdActual = data[0].id; 
-            console.log("ID creado con éxito: " + reservaIdActual);
-
             const urlDestino = `https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok&reserva_id=${reservaIdActual}`;
             
             const contenedorQR = document.getElementById("qrcode");
@@ -48,12 +31,11 @@ async function verificarYGenerar() {
             document.getElementById("pantalla-inicio").style.display = "none";
             document.getElementById("pantalla-resultado").style.display = "flex";
 
-            // 🚩 REVISA AQUÍ: Chama á escoita coa variable correcta
             activarEscoitaRealtime(reservaIdActual);
             resetTimer();
 
         } catch (err) {
-            alert("Erro ao conectar con Supabase: " + err.message);
+            alert("Erro en Supabase: " + err.message);
         }
     } else {
         alert("PIN INCORRECTO");
@@ -63,9 +45,7 @@ async function verificarYGenerar() {
 
 // --- REALTIME: ESCOITAR AO MÓBIL ---
 function activarEscoitaRealtime(id) {
-    console.log("Tablet agardando por: " + id);
-    
-    // Cambia 'supabaseClient' por 'supabase' se esa é a túa variable constante
+    // CORREGIDO: Usamos 'supabase' sin guion
     supabase
       .channel('cambios-hospedes')
       .on(
@@ -77,14 +57,12 @@ function activarEscoitaRealtime(id) {
           filter: `reserva_id=eq.${id}` 
         }, 
         (payload) => {
-            console.log('¡Rexistro detectado!', payload.new);
             confirmarRexistroExitoso(payload.new.nombre);
         }
       )
       .subscribe();
 }
 
-// --- PANTALLA DE ÉXITO FINAL ---
 function confirmarRexistroExitoso(nombre) {
     const resultado = document.getElementById("pantalla-resultado");
     resultado.innerHTML = `
@@ -99,21 +77,10 @@ function confirmarRexistroExitoso(nombre) {
     `;
 }
 
-// --- XESTIÓN DE INACTIVIDADE ---
 function resetTimer() {
     clearTimeout(tempoInactividade);
-    const pantallaResultado = document.getElementById("pantalla-resultado");
-    const qrVisible = pantallaResultado && pantallaResultado.style.display === "flex";
-
-    if (qrVisible) {
-        tempoInactividade = setTimeout(() => {
-            sessionStorage.removeItem('tablet_desbloqueada');
-            window.location.reload(); // Recargamos para volver ao inicio limpo
-        }, 300000); // 5 minutos
-    }
+    tempoInactividade = setTimeout(() => {
+        sessionStorage.removeItem('tablet_desbloqueada');
+        window.location.reload();
+    }, 300000);
 }
-
-// Escoitar interaccións para o timer
-document.onmousemove = resetTimer;
-document.onkeypress = resetTimer;
-document.ontouchstart = resetTimer;
