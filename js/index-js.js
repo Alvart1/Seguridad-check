@@ -25,7 +25,7 @@ async function verificarYGenerar() {
     if (input.value === pinCorrecto) {
         try {
             // 🚩 REVISA AQUÍ: Se usas _supabase arriba, aquí tamén
-            const { data, error } = await _supabase
+            const { data, error } = await supabase
                 .from('reservas')
                 .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
                 .select();
@@ -66,7 +66,7 @@ function activarEscoitaRealtime(id) {
     console.log("Tablet agardando por: " + id);
     
     // Cambia 'supabaseClient' por '_supabase' se esa é a túa variable constante
-    _supabase
+    supabase
       .channel('cambios-hospedes')
       .on(
         'postgres_changes', 
