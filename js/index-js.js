@@ -16,6 +16,7 @@ document.querySelector(".titulo h1").onclick = function() {
     // Reiniciar contador si no completa los 5 clics en 3 segundos
     setTimeout(() => { clicsSecretos = 0; }, 3000);
 };
+
 let tempoInactividade; // Declaramos fóra para que sexa global
 
 function verificarYGenerar() {
@@ -48,7 +49,8 @@ function verificarYGenerar() {
             resultado.style.display = "flex";
             
             // Actualizamos también el enlace de texto por si acaso
-            document.querySelector(".enlace-secreto").href = urlDestino;
+            const enlace = document.querySelector(".enlace-secreto");
+            if(enlace) enlace.href = urlDestino;
             
             resetTimer();
         }
@@ -63,14 +65,13 @@ function resetTimer() {
     clearTimeout(tempoInactividade);
     
     // IMPORTANTE: Só activamos o timer se o QR está na pantalla.
-    // Se o usuario acertou o PIN e estamos noutra páxina, o timer non debe facer nada.
     const pantallaResultado = document.getElementById("pantalla-resultado");
     const qrVisible = pantallaResultado && pantallaResultado.style.display === "flex";
 
     if (qrVisible) {
         tempoInactividade = setTimeout(() => {
             sessionStorage.removeItem('tablet_desbloqueada');
-            window.location.href = "index.html";
+            window.location.reload(); // Recarga para volver ao estado inicial
         }, 300000); // 5 minutos
     }
 }
