@@ -27,7 +27,7 @@ async function verificarYGenerar() {
 
     if (input.value === pinCorrecto) {
         // 1. Xeramos o ID único para esta sesión
-        reservaIdActual = "RES-" + Date.now();
+        reservaIdActual = Date.now();
         sessionStorage.setItem('tablet_desbloqueada', 'true');
 
         // 2. A URL inclúe o reserva_id para que o móbil o saiba
