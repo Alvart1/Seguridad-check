@@ -109,7 +109,7 @@ async function enviarFormulario(e) {
 
     const datos = { 
         // 🚩 IMPORTANTE: reservaId debe ser o que capturamos ao principio
-        reserva_id: reservaId, 
+        reserva_id: parseInt(reservaIdDendeURL), 
         nombre: document.getElementById('nombre').value,
         apellidos: document.getElementById('apellidos').value,
         genero: document.getElementById('genero').value, 

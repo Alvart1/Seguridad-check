@@ -21,38 +21,42 @@ document.querySelector(".titulo h1").onclick = function() {
 async function verificarYGenerar() {
     const pinCorrecto = "1234"; 
     const input = document.getElementById("pinInput");
-    const inicio = document.getElementById("pantalla-inicio");
-    const resultado = document.getElementById("pantalla-resultado");
-    const contenedorQR = document.getElementById("qrcode");
 
     if (input.value === pinCorrecto) {
-        // 1. Xeramos o ID único para esta sesión
-        // Xeramos un número aleatorio entre 1 e 1.000.000
-        reservaIdActual = Math.floor(Math.random() * 1000);
-        sessionStorage.setItem('tablet_desbloqueada', 'true');
+        try {
+            // 1. CREAMOS unha reserva real en Supabase para ter un ID válido
+            const { data, error } = await supabaseClient
+                .from('reservas')
+                .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
+                .select();
 
-        // 2. A URL inclúe o reserva_id para que o móbil o saiba
-        const urlDestino = `https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok&reserva_id=${reservaIdActual}`;
-        
-        // 3. Limpamos e xeramos o QR
-        contenedorQR.innerHTML = ""; 
-        new QRCode(contenedorQR, {
-            text: urlDestino,
-            width: 250,
-            height: 250
-        });
+            if (error) throw error;
 
-        inicio.style.display = "none";
-        resultado.style.display = "flex";
-        
-        // 4. Actualizamos o enlace secreto por se falla o QR
-        const enlaceSecreto = document.querySelector(".enlace-secreto");
-        if(enlaceSecreto) enlaceSecreto.href = urlDestino;
+            // 2. Usamos o ID real que nos deu a base de datos
+            reservaIdActual = data[0].id; 
+            console.log("ID de reserva real creado: " + reservaIdActual);
 
-        // 5. ACTIVAMOS O REALTIME
-        activarEscoitaRealtime(reservaIdActual);
-        
-        resetTimer();
+            // 3. Xeramos o QR co ID REAL
+            const urlDestino = `https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok&reserva_id=${reservaIdActual}`;
+            
+            const contenedorQR = document.getElementById("qrcode");
+            contenedorQR.innerHTML = ""; 
+            new QRCode(contenedorQR, {
+                text: urlDestino,
+                width: 250,
+                height: 250
+            });
+
+            document.getElementById("pantalla-inicio").style.display = "none";
+            document.getElementById("pantalla-resultado").style.display = "flex";
+
+            // 4. A tablet queda escoitando ese ID real
+            activarEscoitaRealtime(reservaIdActual);
+            resetTimer();
+
+        } catch (err) {
+            alert("Erro ao crear reserva en Supabase: " + err.message);
+        }
     } else {
         alert("PIN INCORRECTO");
         input.value = "";
