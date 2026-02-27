@@ -155,4 +155,78 @@ async function finalizarProceso() {
 
         localStorage.setItem('hospede_rexistrado', 'true');
 
-        // 3. Pantalla
+        // 3. Pantalla final
+        if (reservaIdDendeURL) {
+            document.body.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; font-family: sans-serif; background-color: #f4f7f6; padding: 20px;">
+                    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
+                        <h1 style="color: #2ecc71;">¡Rexistro completado!</h1>
+                        <p>Xa podes mirar a tablet da entrada. O caixón das chaves está listo para abrirse.</p>
+                    </div>
+                </div>`;
+        } else {
+            // Se é uso manual na tablet, imos a configurar o PIN de acceso
+            window.location.href = "crear-cuenta.html";
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("O rexistro gardouse, pero houbo un problema ao finalizar o proceso.");
+    }
+}
+
+// --- 3. FUNCIÓNS DA FIRMA ---
+
+function configurarFirma() {
+    const pouse = () => { debuxando = false; ctx.beginPath(); };
+    const mover = (e) => {
+        if (!debuxando) return;
+        const rect = canvas.getBoundingClientRect();
+        
+        // Soporte para rato e pantallas táctiles
+        const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+        const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+        
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#000";
+        
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    };
+
+    canvas.addEventListener('mousedown', () => debuxando = true);
+    canvas.addEventListener('mouseup', pouse);
+    canvas.addEventListener('mousemove', mover);
+    
+    // Eventos táctiles para móbiles
+    canvas.addEventListener('touchstart', (e) => { 
+        debuxando = true; 
+        e.preventDefault(); 
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { 
+        mover(e); 
+        e.preventDefault(); 
+    }, { passive: false });
+    canvas.addEventListener('touchend', pouse);
+}
+
+function limparFirma() { 
+    if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    }
+}
+
+// --- 4. OUTROS ---
+
+function resetTimer() {
+    clearTimeout(tempoInactividade);
+    // Se pasan 5 minutos sen facer nada, volvemos ao inicio por seguridade
+    tempoInactividade = setTimeout(() => {
+        window.location.href = "index.html";
+    }, 300000);
+}
