@@ -1,11 +1,12 @@
 // --- CONFIGURACIÓN ---
-// --- CONFIGURACIÓN ---
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
 const _supabase = supabase.createClient(URL_SUPA, KEY_SUPA);
 const Public_KEY_Emailjs = '-7vKXPKDrKzQiVSrn';
 const Service_ID_emailjs = 'service_cog5jua';
 const Templace_ID_emailjs = 'template_5m1y4si';
+const urlParams = new URLSearchParams(window.location.search);
+const reservaIdDendeURL = urlParams.get('reserva_id');
 
 let totalHospedes = 0, hospedeActual = 1, reservaId = null;
 let canvas, ctx, debuxando = false;
@@ -79,27 +80,36 @@ function mostrarSeccion(id) {
 
 async function comezarRexistro(numero) {
     totalHospedes = numero;
-    try {
-        const { data, error } = await _supabase
-            .from('reservas')
-            .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
-            .select();
-        if (error) throw error;
-        reservaId = data[0].id;
+    
+    // 🚩 PRIORIDADE: Se xa veño cun ID do QR, uso ese.
+    if (reservaIdDendeURL) {
+        reservaId = reservaIdDendeURL;
+        console.log("Usando reserva existente dende QR: " + reservaId);
         mostrarSeccion('seccion-formulario');
-    } catch (err) {
-        alert("Erro ao conectar coa base de datos");
+    } else {
+        // Se non hai ID na URL (caso raro de uso manual na tablet), creamos unha nova
+        try {
+            const { data, error } = await _supabase
+                .from('reservas')
+                .insert([{ fecha_entrada: new Date().toISOString().split('T')[0] }])
+                .select();
+            if (error) throw error;
+            reservaId = data[0].id;
+            mostrarSeccion('seccion-formulario');
+        } catch (err) {
+            alert("Erro ao conectar coa base de datos");
+        }
     }
 }
 
 async function enviarFormulario(e) {
     e.preventDefault();
     
-    // Capturar a firma como imaxe Base64
     const firmaImagen = canvas.toDataURL(); 
 
     const datos = { 
-        reserva_id: reservaId,
+        // 🚩 IMPORTANTE: reservaId debe ser o que capturamos ao principio
+        reserva_id: reservaId, 
         nombre: document.getElementById('nombre').value,
         apellidos: document.getElementById('apellidos').value,
         genero: document.getElementById('genero').value, 
@@ -107,7 +117,7 @@ async function enviarFormulario(e) {
         direccion: document.getElementById('direccion').value,  
         fecha_nacimiento: document.getElementById('fecha_nac').value,
         email: document.getElementById('correo').value,
-        firma_base64: firmaImagen // Agora si se garda no PDF
+        firma_base64: firmaImagen 
     };
 
     const { error } = await _supabase.from('hospedes').insert([datos]);
@@ -119,6 +129,7 @@ async function enviarFormulario(e) {
             limparFirma();
             document.getElementById('titulo-formulario').innerText = `Datos del Viajero ${hospedeActual}`;
         } else {
+            // Se é o último hóspede, finalizamos
             finalizarProceso();
         }
     } else {
@@ -128,7 +139,7 @@ async function enviarFormulario(e) {
 
 async function finalizarProceso() {
     try {
-        // Rexistrar evento
+        // 1. Rexistrar o evento de Check-in completado para que quede constancia
         await _supabase.from('eventos_sistema').insert([{
             reserva_id: reservaId,
             tipo_evento: 'checkin_completado',
@@ -136,16 +147,54 @@ async function finalizarProceso() {
             notificado: false
         }]);
 
-        // Enviar Email
+        // 2. Enviar o aviso por EmailJS (notificación ao propietario)
         emailjs.send(Service_ID_emailjs, Templace_ID_emailjs, {
             reserva_id: reservaId,
-            fecha_evento: new Date().toLocaleString()
+            fecha_evento: new Date().toLocaleString(),
+            mensaje: "O hóspede completou o rexistro e xa ten acceso ao caixón."
         });
 
+        // 3. Gardar estado local
         localStorage.setItem('hospede_rexistrado', 'true');
-        window.location.href = "crear-cuenta.html";
+
+        // 4. RESPOSTA VISUAL DEPENDENDO DO DISPOSITIVO
+        if (reservaIdDendeURL) {
+            // Caso: O cliente está no seu MÓBIL
+            // Limpamos a pantalla e mostramos unha mensaxe clara para que solte o teléfono
+            document.body.innerHTML = `
+                <div style="
+                    display: flex; 
+                    flex-direction: column; 
+                    align-items: center; 
+                    justify-content: center; 
+                    height: 100vh; 
+                    text-align: center; 
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: #f4f7f6;
+                    padding: 20px;
+                ">
+                    <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
+                        <h1 style="color: #2ecc71; margin-bottom: 10px;">¡Rexistro completado!</h1>
+                        <p style="color: #666; font-size: 1.1rem; line-height: 1.5;">
+                            Grazas por completar os teus datos.<br>
+                            <b>Agora xa podes usar a tablet da entrada</b><br>
+                            para recoller as túas chaves.
+                        </p>
+                        <div style="margin-top: 30px; padding: 10px; border-top: 1px solid #eee; font-size: 0.9rem; color: #999;">
+                            Podes pechar esta pestana.
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Caso: O cliente está directamente na TABLET (uso manual)
+            window.location.href = "crear-cuenta.html";
+        }
+
     } catch (err) {
-        console.error(err);
+        console.error("Erro no proceso final:", err);
+        alert("O rexistro gardouse, pero houbo un erro ao finalizar. Por favor, avisa ao propietario.");
     }
 }
 
