@@ -140,7 +140,7 @@ async function enviarFormulario(e) {
 async function finalizarProceso() {
     try {
         // 1. Rexistrar o evento de Check-in completado para que quede constancia
-        await _supabase.from('eventos_sistema').insert([{
+        await supabase.from('eventos_sistema').insert([{
             reserva_id: reservaId,
             tipo_evento: 'checkin_completado',
             fecha_evento: new Date().toISOString(),
