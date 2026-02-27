@@ -2,7 +2,7 @@
 // CONFIGURACIÓN SUPABASE
 // ===============================
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
-const KEY_SUPA = 'TU_PUBLIC_ANON_KEY_AQUI'; // ⚠️ pon tu anon public key real
+const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; // ⚠️ pon tu anon public key real
 const supabaseClient = supabase.createClient(URL_SUPA, KEY_SUPA);
 
 // ===============================
