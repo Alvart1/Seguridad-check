@@ -20,7 +20,7 @@ let tempoInactividade; // Declaramos fóra para que sexa global
 
 function verificarYGenerar() {
     const pinCorrecto = "1234"; 
-    const urlDestino = "https://alvart1.github.io/Seguridad-check/formulario.html";
+    const urlDestino = "https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok";
     
     const input = document.getElementById("pinInput");
     const inicio = document.getElementById("pantalla-inicio");
