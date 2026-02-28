@@ -110,3 +110,17 @@ async function guardarYVolver(metodo) {
         alert("Error de conexión: " + err.message);
     }
 }
+// ESCUCHA EN TIEMPO REAL: De la Foto al botón de "Abrir Cajón"
+const canalAcceso = supabaseClient
+  .channel('cambios-acceso')
+  .on('postgres_changes', 
+      { event: 'UPDATE', schema: 'public', table: 'hospedes' }, 
+      (payload) => {
+          // Si el cliente ya tiene foto o PIN guardado...
+          if (payload.new.foto_url || payload.new.pin_acceso) {
+              // La tablet salta a la pantalla final de las llaves
+              window.location.href = "acceso-llaves.html";
+          }
+      }
+  )
+  .subscribe();
