@@ -227,3 +227,6 @@ function xerarPDF(h, fecha) {
 
     doc.save(`Parte_${h.codigo_documento}.pdf`);
 }
+function cerrarPanel() {
+    window.location.href = "index.html";
+}
