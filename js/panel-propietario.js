@@ -2,8 +2,9 @@
 const CLAVE_ADMIN = "abc123."; 
 const IP_Raspberry = "http://10.182.60.63:3000/abrir";
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
-const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
-const supabaseClient = supabase.createClient(URL_SUPA, KEY_SUPA);
+const KEY_SUPA_ANON = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; // Tu clave pública
+
+const supabaseClient = supabase.createClient(URL_SUPA, KEY_SUPA_ANON);
 
 // --- FUNCIONES DE ACCESO PROTEGIDO ---
 
