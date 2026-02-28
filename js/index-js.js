@@ -20,47 +20,22 @@ let tempoInactividade; // Declaramos fóra para que sexa global
 
 function verificarYGenerar() {
     const pinCorrecto = "1234"; 
-    const urlDestino = "https://alvart1.github.io/Seguridad-check/formulario.html?auth=ok";
+    // Añadimos el parámetro auth=ok para que el formulario sepa que venimos de aquí
+    const urlDestino = "formulario.html?auth=ok";
     
     const input = document.getElementById("pinInput");
-    const inicio = document.getElementById("pantalla-inicio");
-    const resultado = document.getElementById("pantalla-resultado");
-    const contenedorQR = document.getElementById("qrcode");
 
     if (input.value === pinCorrecto) {
-        // 1. DETEMOS calquera redirección automática por inactividade
-        clearTimeout(tempoInactividade);
-
-        // 2. Autorizamos a sesión
+        // Marcamos la sesión como desbloqueada para la navegación interna
         sessionStorage.setItem('tablet_desbloqueada', 'true');
-
-        // 3. Comprobamos rexistro previo
-        const xaRexistrado = localStorage.getItem('hospede_rexistrado');
-
-        if (xaRexistrado === 'true') {
-            // USAMOS .replace PARA EVITAR QUE O BOTÓN "ATRÁS" DEN ERROS
-            window.location.replace("acceso-llaves.html"); 
-        } else {
-            // Xeramos o QR para o novo cliente
-            contenedorQR.innerHTML = ""; 
-            new QRCode(contenedorQR, {
-                text: urlDestino,
-                width: 250,
-                height: 250
-            });
-
-            inicio.style.display = "none";
-            resultado.style.display = "flex";
-            
-            // Iniciamos o timer só agora que o QR é visible
-            resetTimer();
-        }
+        
+        // Redirección inmediata
+        window.location.href = urlDestino;
     } else {
         alert("PIN INCORRECTO");
         input.value = "";
     }
 }
-
 // --- XESTIÓN DE INACTIVIDADE ---
 function resetTimer() {
     clearTimeout(tempoInactividade);

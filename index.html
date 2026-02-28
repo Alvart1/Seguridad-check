@@ -9,33 +9,19 @@
 
 </head>
 <body>
-
     <div id="pantalla-inicio">
         <div class="titulo">
-            <h1>Bienvenido querido cliente!!!</h1>
+            <h1>Bienvenido</h1>
         </div>
         
-        <p>Introduzca su PIN para generar el código QR de acceso</p>
+        <p>Introduzca el PIN de la tablet para comenzar su registro</p>
         
         <input type="password" id="pinInput" placeholder="PIN" maxlength="4">
-        <button onclick="verificarYGenerar()">Desbloquear</button>
+        <button onclick="verificarYGenerar()">Comenzar Check-in</button>
     </div>
 
-    <div id="pantalla-resultado" style="display: none; width: 100%; flex-direction: column; align-items: center;">
-        <div class="titulo">
-            <h1>Acceso Listo</h1>
-        </div>
-
-        <p>Escanee el código o use el enlace inferior</p>
-
-        <div id="qrcode"></div>
-
-        <a href="https://alvart1.github.io/Seguridad-check/formulario.html" class="enlace-secreto">
-            Acceder mediante enlace directo
-        </a><br>
-
-        <button onclick="window.location.reload()" >Volver</button>
-    </div>
+    <script src="index-js.js"></script>
+</body>
 
     <script src="js/index-js.js"></script>
 </body>
