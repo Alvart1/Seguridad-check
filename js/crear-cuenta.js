@@ -111,14 +111,24 @@ async function guardarYVolver(metodo) {
     }
 }
 // ESCUCHA EN TIEMPO REAL: De la Foto al botón de "Abrir Cajón"
+// --- ESCUCHA EN TIEMPO REAL PARA LA TABLA DE ACCESOS ---
 const canalAcceso = supabaseClient
-  .channel('cambios-acceso')
+  .channel('espera-foto-acceso')
   .on('postgres_changes', 
-      { event: 'UPDATE', schema: 'public', table: 'hospedes' }, 
+      { 
+          event: 'INSERT', // O 'UPDATE' si primero creas la fila y luego subes la foto
+          schema: 'public', 
+          table: 'accesos_llaves' 
+      }, 
       (payload) => {
-          // Si el cliente ya tiene foto o PIN guardado...
-          if (payload.new.foto_url || payload.new.pin_acceso) {
-              // La tablet salta a la pantalla final de las llaves
+          console.log('¡Se detectó un nuevo acceso (foto/PIN)!', payload.new);
+          
+          // Verificamos si la fila tiene la foto o el PIN que esperábamos
+          if (payload.new.foto_url || payload.new.pin_usuario) {
+              // Guardamos el ID o el nombre para la siguiente pantalla
+              localStorage.setItem('acceso_confirmado', 'true');
+              
+              // ¡La tablet salta sola al panel de apertura!
               window.location.href = "acceso-llaves.html";
           }
       }
