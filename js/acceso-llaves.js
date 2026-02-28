@@ -169,4 +169,3 @@ async function confirmarFinEstancia() {
         alert("Error inesperado");
     }
 }
-
