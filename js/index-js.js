@@ -83,13 +83,3 @@ document.onmousemove = resetTimer;
 document.onkeypress = resetTimer;
 document.ontouchstart = resetTimer;
 // ESCUCHA EN TIEMPO REAL: Del QR a la pantalla de Foto/PIN
-const canalHospedes = supabaseClient
-  .channel('cambios-hospedes')
-  .on('postgres_changes', 
-      { event: 'INSERT', schema: 'public', table: 'hospedes' }, 
-      (payload) => {
-          // Si el móvil inserta un huésped, la tablet salta
-          window.location.href = "crear-cuenta.html"; 
-      }
-  )
-  .subscribe();

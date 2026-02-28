@@ -111,22 +111,3 @@ async function guardarYVolver(metodo) {
     }
 }
 // --- ESCUCHA EN TIEMPO REAL: De la Foto al botón de "Abrir Cajón" ---
-const canalAcceso = supabaseClient
-  .channel('espera-acceso-llaves')
-  .on('postgres_changes', 
-      { 
-          event: 'INSERT', // Cambia a 'UPDATE' si en tu móvil solo actualizas una fila que ya existía
-          schema: 'public', 
-          table: 'accesos_llaves' 
-      }, 
-      (payload) => {
-          console.log('¡Acceso detectado!', payload.new);
-          
-          // Guardamos en la tablet que ya puede mostrar el botón de abrir
-          localStorage.setItem('acceso_permitido', 'true');
-
-          // ¡SALTO AUTOMÁTICO! La tablet pasa a la pantalla de las llaves
-          window.location.href = "acceso-llaves.html";
-      }
-  )
-  .subscribe();
