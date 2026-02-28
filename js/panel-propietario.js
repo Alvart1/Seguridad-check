@@ -35,16 +35,16 @@ async function irReservas() {
         return;
     }
 
-    let seccion = document.getElementById('seccion-reservas');
+let seccion = document.getElementById('seccion-reservas');
     if (!seccion) {
         seccion = document.createElement('div');
         seccion.id = 'seccion-reservas';
-        seccion.style.marginLeft = "240px";
-        seccion.style.padding = "20px";
+        // ELIMINAMOS seccion.style.marginLeft = "240px"
         document.body.appendChild(seccion);
     }
     
     seccion.style.display = 'block';
+    seccion.style.width = '100%'; // Forzamos ancho total
     seccion.innerHTML = '<h2>Listado Detallado de Huéspedes</h2><div id="tabla-datos">Cargando...</div>';
 
     try {
@@ -69,23 +69,23 @@ async function irReservas() {
 
         if (error) throw error;
 
-        let html = `
-            <table style="width:100%; border-collapse: collapse; background: white; font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); color: black;">
-                <thead>
-                    <tr style="background-color: #2c3e50; color: white; text-align: left;">
-                        <th style="padding:10px;">Fecha Registro</th>
-                        <th style="padding:10px;">Nombre y Apellidos</th>
-                        <th style="padding:10px;">DNI / Pasaporte</th>
-                        <th style="padding:10px;">Género</th>
-                        <th style="padding:10px;">F. Nacimiento</th>
-                        <th style="padding:10px;">Dirección</th>
-                        <th style="padding:10px;">Email</th>
-                        <th style="padding:10px;">Estado</th>
-                        <th style="padding:10px;">Parte</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+let html = `
+    <table style="width:100%; border-collapse: collapse; background: white; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); color: black; margin-bottom: 50px;">
+        <thead>
+            <tr style="background-color: #2c3e50; color: white; text-align: left;">
+                <th style="padding:15px; border-bottom: 2px solid #1a252f;">Fecha Registro</th>
+                <th style="padding:15px; border-bottom: 2px solid #1a252f;">Nombre y Apellidos</th>
+                <th style="padding:15px; border-bottom: 2px solid #1a252f;">DNI / Pasaporte</th>
+                <th style="padding:15px; border-bottom: 2px solid #1a252f;">Género</th>
+                <th style="padding:15px; border-bottom: 2px solid #1a252f;">F. Nacimiento</th>
+                <th style="padding:15px; border-bottom: 2px solid #1a252f;">Dirección</th>
+                <th style="padding:15px; border-bottom: 2px solid #1a252f;">Email</th>
+                <th style="padding:15px; border-bottom: 2px solid #1a252f;">Estado</th>
+                <th style="padding:15px; border-bottom: 2px solid #1a252f; text-align: center;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+`;
 
         data.forEach(reserva => {
             const fechaRegistro = new Date(reserva.created_at).toLocaleString('es-ES', {
@@ -108,12 +108,12 @@ async function irReservas() {
                                 ${reserva.estado_estancia || 'activa'}
                             </span>` : ''}
                         </td>
-                        <td style="padding:10px;">
-                        <button onclick='xerarPDF(${JSON.stringify(h).replace(/'/g, "&apos;")}, "${fechaRegistro}")' 
-                        style="cursor:pointer; background:#3498db; color:white; border:none; padding:5px; border-radius:3px;">
-                         PDF
-                        </button>
-                        </td>
+                        <td style="padding:10px; text-align: center;">
+        <button onclick='xerarPDF(${JSON.stringify(h).replace(/'/g, "&apos;")}, "${fechaRegistro}")' 
+            style="cursor:pointer; background:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:5px; font-weight: bold; transition: 0.3s; display: inline-flex; align-items: center; gap: 5px;">
+            📄 PDF
+        </button>
+    </td>
                     </tr>
                 `;
             });
