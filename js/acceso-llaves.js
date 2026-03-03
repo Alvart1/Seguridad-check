@@ -1,7 +1,7 @@
 /**
  * Lóxica para o Panel de Control (acceso-llaves.html)
  */
-const IP_Raspberry = "http://10.182.60.63:3000/abrir";
+const IP_Raspberry = "http://192.168.137.30:3000/abrir";
 const URL_SUPA = 'https://xfwovtrlpipnghoyduql.supabase.co';
 const KEY_SUPA = 'sb_publishable_xi9wcDolJG6kKTnU_2O0fA_n507M8fu'; 
 const supabaseClient = supabase.createClient(URL_SUPA, KEY_SUPA);
