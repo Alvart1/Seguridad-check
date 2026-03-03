@@ -11,7 +11,7 @@ const supabaseClient = supabase.createClient(URL_SUPA, KEY_SUPA_ANON);
 function irCamaras() {
     const pass = prompt("Introduce la clave de seguridad para ver las cámaras:");
     if (pass === CLAVE_ADMIN) {
-        window.location.href = "http://10.182.60.63/zm/index.php";
+        window.location.href = "http://192.168.137.30/zm/index.php";
     } else {
         alert("Clave incorrecta");
     }
